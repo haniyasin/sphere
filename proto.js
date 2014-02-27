@@ -5,6 +5,36 @@
 
 //initialize session
 
+
+
+
+
+function editor_new(send, react){
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////old stuff, only as ideas from past!!!!!!
+///////////////////////////////////////////
 var session_id = localstorage.get('session_id') | session.id_generate();
 
 //var dht = manager.get('dht');
