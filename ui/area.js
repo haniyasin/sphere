@@ -1,36 +1,33 @@
-exports.init = function(send, react){
-    var _name = null,
-    _object_in = null,
-    _element = null,
-    size = 1;
-    
-    return {
-	"in" : {
-	    "init" : function(name){
-		_name = name;
-		//нужно регистрировать себя в соответствии с именем
-		send_sequent(['ui', 'give_element'],
-			     function(client, element){
-				 _element = element;
-				 //надо придать фрейму характеристики area_primary  или area_slave
-			     },
-			     ['sphere.object_manager', 'load', 'sphere.objects.welcome', element]);
-	    },
-	    "visible_changed" : function(client, state){
+exports.area = function(context, send, react, sequence){
+    context.set('name', '');
+    context.set('size', 'normal');
+
+    react("init",
+	  function(next, name, objects_maker){
+	      context.set('name', name);
+	      //нужно регистрировать себя в соответствии с именем
+	      sequence(['s',ui, 'give_element', context.service],
+		       function(sequence, ret, next){
+			   //надо придать фрейму характеристики area_primary  или area_slave
+		       },
+		       ['s', context.service, 'set', 'element', 'ret[0]'],
+		       ['s', objects_maker, 'load', 'welcome', 'ret[0'],
+		       ['s', context.service, 'set', 'object_in', 'ret.last']);
+	  });
+    react("visible",
+	  function(next, visible){
 		//важно что поверхности, они же element, отключаются ui рекурсивно, так что может и не надо будет ничего делать
 		//тут приостанавливаем или возобновляем свою визуальную или иную активность
-	    },
-	    "resize" : function(client){
-		//изменяем размер либо до максимального либо до нормального, но только для primary  
-	    },
-	    "open" : function(client, address){
-		send(object_in, 'release');
-		send('sphere.object_manager', 'load', address, element);
-	    },
-	    
-	    "object_created" : function(client, object_in){
-                _object_in = object_in;
-	    }
-	}    
-    }
+	    });
+    
+    react("resize", 
+	  function(next){
+	      //изменяем размер либо до максимального либо до нормального, но только для primary  
+	  });
+    react("open",
+	  function(next, address){
+		sequence(['s', context.get('object_in'), 'release'],
+			 ['s', objects_maker, 'load', address, context.get('element')],
+			 ['s', context.service, 'set', 'object_in', 'ret.last']);
+	  });
 }
