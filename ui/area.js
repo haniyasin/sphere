@@ -1,10 +1,11 @@
 exports.area = function(context, send, react, sequence){
-    context.set('name', '');
     context.set('size', 'normal');
 
     react("init",
-	  function(next, name, objects_maker){
+	  function(next, name, ui, objects_maker){
 	      context.set('name', name);
+	      context.set('ui', ui);
+	      context.set('object_maker', objects_maker);
 	      //нужно регистрировать себя в соответствии с именем
 	      sequence(['s',ui, 'give_element', context.service],
 		       function(sequence, ret, next){
@@ -27,7 +28,7 @@ exports.area = function(context, send, react, sequence){
     react("open",
 	  function(next, address){
 		sequence(['s', context.get('object_in'), 'release'],
-			 ['s', objects_maker, 'load', address, context.get('element')],
+			 ['s', context.get('objects_maker'), 'load', address, context.get('element')],
 			 ['s', context.service, 'set', 'object_in', 'ret.last']);
 	  });
 }
