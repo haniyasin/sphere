@@ -4,7 +4,7 @@ exports.init = function(context, send, react, sequence){
 	      context.set('ui', ui);
 	      context.set('area', area);
 	      sequence(['s', ui, 'give_element'],
-		       ['lf', function(context, sequence, ret, next){
+		       ['fn', function(context, sequence, ret, next){
 			 context.set('element', ret.last);
 			    var ui_item = {
 				"image" : {
@@ -16,7 +16,11 @@ exports.init = function(context, send, react, sequence){
 					    "x" : "3%",
 					    "y" : "1%",
 					    "width" : "75%",
-					    "heigth" : "10%"			    
+					    "heigth" : "10%",
+					    
+					    "on_typed" : [
+						['s', context.service, 'set', 'address', 'ret.last']
+					    ] 
 					},
 					"button" : {
 					    "name" : 'gobutton',
@@ -24,12 +28,21 @@ exports.init = function(context, send, react, sequence){
 					    "x" : "78%",
 					    "y" : "1%",
 					    "width" : "20%",
-					    "heigth" : "10%"
+					    "heigth" : "10%",
+					    
+					    "on_pressed" : [
+						['s', context.service, 'get', 'address']
+						['s', context.service, 'get', 'area'],
+						['ff', function(sequence, ret, next){
+						     if(ret.first == 'pressed')
+							 sequence.push('s', ret.last, 'open', ret[-1]);
+						 }]
+					    ]
 					}		    
 				    }
 				}
 			    }
-			    sequence.push('s', context.get('ui'), 'fill_element', element, ui_item);	
+			    sequence.push('s', context.get('ui'), 'fill_element', ret.last, ui_item);	
 			}]
 		      );
 	  });
@@ -38,19 +51,5 @@ exports.init = function(context, send, react, sequence){
 	  function(next, state){
 	      //важно что поверхности, они же element, отключаются ui рекурсивно, так что может и не надо будет ничего делать
 	      //тут приостанавливаем или возобновляем свою визуальную или иную активность
-	  });
-    
-    //скорее работу самого виджета адрес надо вынести в отдельный сервис
-    react("typed",
-	  function(next, item, typed){
-		//когда набирают в entry, люди приходят сообщения с тем, что уже набрано. В дальнейшем можно
-	      //запросить всё, что было набрано
-	      context.set('address', typed);	    
-	  });
-    
-    react("pressed",
-	  function(next, item, state){
-	      if(state == 'pressed')
-		  send(context.get('area'), 'open', context.get('address'))
 	  });
 }

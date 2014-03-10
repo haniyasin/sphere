@@ -25,6 +25,10 @@ exports.area = function(context, send, react, sequence){
 	  function(next){
 	      //изменяем размер либо до максимального либо до нормального, но только для primary  
 	  });
+    react("who_opened",
+	  function(next){
+	      next(context.get(object_in));
+	  })
     react("open",
 	  function(next, address){
 		sequence(['s', context.get('object_in'), 'release'],

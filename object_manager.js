@@ -10,7 +10,7 @@ exports.init = function(send, react){
 	      //благодаря обязательному использованию arguments
 	      //при посыле сообщения из обработчика сообщения и таким образом упаковыванию аргументов
 	      //
-	      send_sequent(['dsa.storage', 'extract', object_info, { "type" : true, "data" : true}],
+	      sequent_send(['dsa.storage', 'extract', object_info, { "type" : true, "data" : true}],
 			   ['dsa.manager', 'get', 'ret1[0].type'],
 			   ['ret2[0]', 'load', 'ret1[0].data', element],
 			   [source, 'object_created', 'ret2[0]']
