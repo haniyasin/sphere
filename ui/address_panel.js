@@ -1,4 +1,4 @@
-exports.init = function(context, send, react, sequence){
+exports.address_panel = function(context, send, react, sequence){
     react("init",
 	  function(next, ui, area){
 	      context.set('ui', ui);

@@ -2,17 +2,17 @@ exports.area = function(context, send, react, sequence){
     context.set('size', 'normal');
 
     react("init",
-	  function(next, name, ui, objects_maker){
+	  function(next, name, ui, objects_loader){
 	      context.set('name', name);
 	      context.set('ui', ui);
-	      context.set('object_maker', objects_maker);
+	      context.set('object_maker', objects_loader);
 	      //нужно регистрировать себя в соответствии с именем
 	      sequence(['s',ui, 'give_element', context.service],
 		       function(sequence, ret, next){
 			   //надо придать фрейму характеристики area_primary  или area_slave
 		       },
 		       ['s', context.service, 'set', 'element', 'ret[0]'],
-		       ['s', objects_maker, 'load', 'welcome', 'ret[0'],
+		       ['s', objects_loader, 'load', 'welcome', 'ret[0'],
 		       ['s', context.service, 'set', 'object_in', 'ret.last']);
 	  });
     react("visible",
@@ -32,7 +32,7 @@ exports.area = function(context, send, react, sequence){
     react("open",
 	  function(next, address){
 		sequence(['s', context.get('object_in'), 'release'],
-			 ['s', context.get('objects_maker'), 'load', address, context.get('element')],
+			 ['s', context.get('objects_loader'), 'load', address, context.get('element')],
 			 ['s', context.service, 'set', 'object_in', 'ret.last']);
 	  });
 }
