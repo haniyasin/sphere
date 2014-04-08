@@ -1,55 +1,74 @@
-exports.address_panel = function(context, send, react, sequence){
-    react("init",
-	  function(next, ui, area){
+/*
+ * top panel with address, go button and other controls
+ * 
+ */
+
+exports.init = function(env, context, send, react, sprout){
+    react("create",
+	  function(stack, ui, area){
 	      context.set('ui', ui);
 	      context.set('area', area);
-	      sequence(['s', ui, 'give_element'],
-		       ['fn', function(context, sequence, ret, next){
-			 context.set('element', ret.last);
-			    var ui_item = {
-				"image" : {
-				    "color" : 'white',
-				    "childs" : {
-					"entry" : {
-					    "name" : 'address',
-					    "color" : 'grey',
-					    "x" : "3%",
-					    "y" : "1%",
-					    "width" : "75%",
-					    "heigth" : "10%",
-					    
-					    "on_typed" : [
-						['s', context.service, 'set', 'address', 'ret.last']
-					    ] 
-					},
-					"button" : {
-					    "name" : 'gobutton',
-					    "color" : 'red',
-					    "x" : "78%",
-					    "y" : "1%",
-					    "width" : "20%",
-					    "heigth" : "10%",
-					    
-					    "on_pressed" : [
-						['s', context.service, 'get', 'address']
-						['s', context.service, 'get', 'area'],
-						['ff', function(sequence, ret, next){
-						     if(ret.first == 'pressed')
-							 sequence.push('s', ret.last, 'open', ret[-1]);
-						 }]
-					    ]
-					}		    
-				    }
-				}
-			    }
-			    sequence.push('s', context.get('ui'), 'fill_element', ret.last, ui_item);	
-			}]
-		      );
+
+	      var _stack = [];
+	      _stack['root'] = {_frame : 0};
+	      sprout([
+			 {
+			     name : 'addr_panel',
+			     action : ['s', ui.panel, 'create', {
+					   x : '5%',
+					   y : '0%',
+					   width : '90%',
+					   height : '100%',
+					   
+					   maximized : false
+				       }, 'root', '_frame'],
+
+			     next : [
+				 {
+				     name : 'address',
+				     action : ['s', ui.entry, 'create', {
+						   "placeholder" : 'введите адрес',
+						   "x" : "0%",
+						   "y" : "0%",
+						   "width" : "76%",
+						   "height" : "15%",
+						   "on_text_change" : [
+						       ['f', function(stack, sprout_pusher){
+							    console.log(stack);
+							} ]
+						   ] 
+					       }, 'addr_panel', 'maximized'],
+				 },
+				 {
+				     action : ['s', ui.button, 'create', {
+						   "color" : 'red',
+						   "x" : "76%",
+						   "y" : "0%",
+						   "width" : "24%",
+						   "height" : "15%",
+
+						   "label" : 'загрузить',
+						   
+						   "on_pressed" : [
+						       ['f', function(stack, sprout_pusher){
+							    console.log('button pressed');
+							}]
+						   ]
+					       }, 'addr_panel', 'maximized']
+				 },
+				 {
+				     action : ['s', ui.label, 'create', {
+						   x : "20%",
+						   y : "5%",
+						   width : "60%",
+						   height : "90",
+						   
+						   text : "никакой страницы не загружено"
+					       }, 'addr_panel', 'minimized']
+				 }
+			     ]
+			 }
+		     ], _stack);
 	  });
-    
-    react("visible",
-	  function(next, state){
-	      //важно что поверхности, они же element, отключаются ui рекурсивно, так что может и не надо будет ничего делать
-	      //тут приостанавливаем или возобновляем свою визуальную или иную активность
-	  });
+   
 }
