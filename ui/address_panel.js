@@ -11,6 +11,7 @@ exports.init = function(env, context, send, react, sprout){
 
 	      var _stack = [];
 	      _stack['root'] = {_frame : 0};
+
 	      sprout([
 			 {
 			     name : 'addr_panel',
@@ -18,8 +19,10 @@ exports.init = function(env, context, send, react, sprout){
 					   x : '5%',
 					   y : '0%',
 					   width : '90%',
-					   height : '100%',
+					   height : '30%',
 					   
+					   position : 'top',
+
 					   maximized : false
 				       }, 'root', '_frame'],
 
@@ -31,7 +34,7 @@ exports.init = function(env, context, send, react, sprout){
 						   "x" : "0%",
 						   "y" : "0%",
 						   "width" : "76%",
-						   "height" : "15%",
+						   "height" : "90%",
 						   "on_text_change" : [
 						       ['f', function(stack, sprout_pusher){
 							    console.log(stack);
@@ -45,7 +48,7 @@ exports.init = function(env, context, send, react, sprout){
 						   "x" : "76%",
 						   "y" : "0%",
 						   "width" : "24%",
-						   "height" : "15%",
+						   "height" : "90%",
 
 						   "label" : 'загрузить',
 						   
