@@ -32,9 +32,9 @@ exports.init = function(env, context, send, react, sprout){
 				     action : ['s', ui.entry, 'create', {
 						   "placeholder" : 'введите адрес',
 						   "x" : "0%",
-						   "y" : "0%",
+						   "y" : "40%",
 						   "width" : "76%",
-						   "height" : "90%",
+						   "height" : "60%",
 						   "on_text_change" : [
 						       ['f', function(stack, sprout_pusher){
 							    console.log(stack);
@@ -46,9 +46,9 @@ exports.init = function(env, context, send, react, sprout){
 				     action : ['s', ui.button, 'create', {
 						   "color" : 'red',
 						   "x" : "76%",
-						   "y" : "0%",
+						   "y" : "40%",
 						   "width" : "24%",
-						   "height" : "90%",
+						   "height" : "60%",
 
 						   "label" : 'загрузить',
 						   
@@ -62,9 +62,9 @@ exports.init = function(env, context, send, react, sprout){
 				 {
 				     action : ['s', ui.label, 'create', {
 						   x : "20%",
-						   y : "5%",
+						   y : "15%",
 						   width : "60%",
-						   height : "90",
+						   height : "70",
 						   
 						   text : "никакой страницы не загружено"
 					       }, 'addr_panel', 'minimized']

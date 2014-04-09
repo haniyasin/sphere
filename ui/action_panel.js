@@ -19,7 +19,7 @@ exports.init = function(env, context, send, react, sprout){
 					   x : '5%',
 					   y : '0%',
 					   width : '90%',
-					   height : '27%',
+					   height : '30%',
 					   
 					   position : 'bottom',
 				   
@@ -29,9 +29,9 @@ exports.init = function(env, context, send, react, sprout){
 			     next : [{
 					 action : ['s', ui.button, 'create', {
 						       "x" : "0%",
-						       "y" : "1%",
+						       "y" : "0%",
 						       "width" : "33%",
-						       "height" : "90%",
+						       "height" : "60%",
 						       
 						       "label" : 'увеличить',
 
@@ -44,9 +44,9 @@ exports.init = function(env, context, send, react, sprout){
 				     {
 					 action : ['s', ui.button, 'create', {
 						       "x" : "33%",
-						       "y" : "1%",
+						       "y" : "0%",
 						       "width" : "33%",
-						       "height" : "90%",
+						       "height" : "60%",
 						       
 						       "label": 'изменить',
 						       "on_pressed" : [
@@ -64,9 +64,9 @@ exports.init = function(env, context, send, react, sprout){
 				     {
 					 action : ['s', ui.button, 'create', {
 						       "x" : "66%",
-						       "y" : "1%",
+						       "y" : "0%",
 						       "width" : "34%",
-						       "height" : "90%",
+						       "height" : "60%",
 						       
 						       "label" : 'создать',
 
@@ -83,9 +83,9 @@ exports.init = function(env, context, send, react, sprout){
 				     {
 					 action : ['s', ui.label, 'create', {
 						       x : "20%",
-						       y : "2%",
+						       y : "15%",
 						       width : "60%",
-						       height : "90%",
+						       height : "70%",
 						       
 						       text : "воспользуйтесь инструментами"
 						   }, 'action_panel', 'minimized']
