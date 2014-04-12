@@ -1,9 +1,9 @@
 //Object loader is responsible for finding object by address/id, loading him from storage and starting with
-//dsa.manager help
+//help of dsa.manager
 //Also it is responsible for releasing object correctly
 
 //object is representation of link to another object within sphere
-
+/*
 exports.init = function(send, react){
     react('update',
 	  function(client, data, element){
@@ -58,6 +58,7 @@ exports.init = function(send, react){
 	      //send('ui)
 	  });
 }
+*/
 //object is representation of image within sphere
 
 exports.image = function(context, send, react, sequence){
@@ -77,11 +78,12 @@ exports.image = function(context, send, react, sequence){
 	  });
 }
 
-exports.object_loader = function(context, send, react, sequence){
-    react("init", function(next, ui){
+exports.init = function(env, context, send, react, sprout){
+    react("init", function(stack, ui){
 	     context.set('ui', ui); 
 	  });
-    react("load", function(next, object_info, element){
+
+    react("load", function(stack, object_info, element){
 	      //необходимо подумать над изменяющимися данным с хранилище
 	      sequence(['s', 'dsa.storage', 'extract', object_info, { "type" : true, "data" : true}],
 		       ['ff', function(sequence, ret, next){
