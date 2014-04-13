@@ -22,12 +22,27 @@ function pc(mq){
 //    var objects_loader = sloader.load('sphere/objects_loader', mq, env);    
 }
 
-exports.init = function(env, context, send, react, sprout){
-    var ui;
-    react('init', function(stack){
-	      var _mq;
-	      if('pc_style') //personal computer interface
-		  ui = pc(_mq);
-	      //creating folowing services: menu, area, items
-	  });
+function elements_init(env, dsa, ll_widgets){
+    var econstructors = env.sphere.parts.ui,
+        elements = [];
+    for (constructor in econtstructors){
+	elements.push(econstructors.init(env, dsa, ll_widgets));
+    }
+    return elements;
+}
+
+exports.init = function(env, dsa){
+    var ll_widgets,
+        hl_elements;
+    dsa.on('init', 
+	   function(stack){
+	       var _mq;
+	       if('pc_style') //personal computer interface
+		   ll_widgets = pc(dsa.mq),
+	       
+	       hl_elements = elements_init(env, dsa, ll_widgets);	       
+	   });
+
+    dsa.on('destroy', function(stack){
+	   });
 }

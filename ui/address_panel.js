@@ -1,10 +1,10 @@
 /*
- * top panel with address, go button and other controls
+ * bottom panel with actions like a create, edit
  * 
  */
 
 exports.init = function(env, context, send, react, sprout){
-    react("create",
+    react("create", 
 	  function(stack, ui, area){
 	      context.set('ui', ui);
 	      context.set('area', area);
@@ -14,64 +14,91 @@ exports.init = function(env, context, send, react, sprout){
 
 	      sprout([
 			 {
-			     name : 'addr_panel',
+			     name : 'action_panel',
 			     action : ['s', ui.panel, 'create', {
 					   x : '5%',
 					   y : '0%',
 					   width : '90%',
 					   height : '30%',
 					   
-					   position : 'top',
-
+					   position : 'bottom',
+				   
 					   maximized : false
 				       }, 'root', '_frame'],
+			     
+			     next : [{
+					 action : ['s', ui.button, 'create', {
+						       "x" : "0%",
+						       "y" : "0%",
+						       "width" : "33%",
+						       "height" : "60%",
+						       
+						       "label" : 'увеличить',
 
-			     next : [
-				 {
-				     name : 'address',
-				     action : ['s', ui.entry, 'create', {
-						   "placeholder" : 'введите адрес',
-						   "x" : "0%",
-						   "y" : "40%",
-						   "width" : "76%",
-						   "height" : "60%",
-						   "on_text_change" : [
-						       ['f', function(stack, sprout_pusher){
-							    console.log(stack);
-							} ]
-						   ] 
-					       }, 'addr_panel', 'maximized'],
-				 },
-				 {
-				     action : ['s', ui.button, 'create', {
-						   "color" : 'red',
-						   "x" : "76%",
-						   "y" : "40%",
-						   "width" : "24%",
-						   "height" : "60%",
+						       "on_pressed" : [
+							   ['f', function(stack, sprout_pusher){}]
+						       ]
+						   }, 'action_panel', 'maximized' 
+						  ]    
+				     },
+				     {
+					 action : ['s', ui.button, 'create', {
+						       "x" : "33%",
+						       "y" : "0%",
+						       "width" : "33%",
+						       "height" : "60%",
+						       
+						       "label": 'изменить',
+						       "on_pressed" : [
+							   ['s', context.service, 'get', 'area'],
+							   ['s', 'ret.last', 'who_opened'],
+							   ['ff', function(sequnce,ret, next){
+								if(ret.last == 'pressed'){
+								    sequence.push('s', ret.last, 'open', 'editor', 'ret[-1]');
+								}
+							    }]
+						       ],
 
-						   "label" : 'загрузить',
-						   
-						   "on_pressed" : [
-						       ['f', function(stack, sprout_pusher){
-							    console.log('button pressed');
-							}]
-						   ]
-					       }, 'addr_panel', 'maximized']
-				 },
-				 {
-				     action : ['s', ui.label, 'create', {
-						   x : "20%",
-						   y : "15%",
-						   width : "60%",
-						   height : "70",
-						   
-						   text : "никакой страницы не загружено"
-					       }, 'addr_panel', 'minimized']
-				 }
-			     ]
+						   }, 'action_panel', 'maximized']
+				     },
+				     {
+					 action : ['s', ui.button, 'create', {
+						       "x" : "66%",
+						       "y" : "0%",
+						       "width" : "34%",
+						       "height" : "60%",
+						       
+						       "label" : 'создать',
+
+						       "on_pressed" : [
+							   ['s', context.service, 'get', 'area'],
+							   ['ff', function(sequnce,ret, next){
+								if(ret.last == 'pressed'){
+								    sequence.push('s', 'ret[-1]', 'open', 'editor')
+								}
+							    }]
+						       ]
+						   }, 'action_panel', 'maximized']	 
+				     },
+				     {
+					 action : ['s', ui.label, 'create', {
+						       x : "20%",
+						       y : "15%",
+						       width : "60%",
+						       height : "70%",
+						       
+						       text : "воспользуйтесь инструментами"
+						   }, 'action_panel', 'minimized']
+				     }
+
+				    ]
 			 }
 		     ], _stack);
 	  });
-   
+    
+    react("visible_changed",
+	  function(client, state){
+		//важно что поверхности, они же element, отключаются ui рекурсивно, так что может и не надо будет ничего делать
+	      //тут приостанавливаем или возобновляем свою визуальную или иную активность
+	  });
 }
