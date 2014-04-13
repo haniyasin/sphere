@@ -7,6 +7,12 @@
  * используя сферу подобно обычному вебсайту и для тех же целей)
  */
 
-exports.init = function(env, context, send, react, sprout){
-    
+exports.init = function(env, dsa){
+    dsa.on('create',
+	  function(stack){
+	  })
+
+    dsa.on('destroy',
+	  function(stack){
+	  })
 }

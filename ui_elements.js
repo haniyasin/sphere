@@ -6,9 +6,10 @@
   * 
  */
 
-function pc(mq){
+function pc(env, mq){
     var ui = {
     }
+    var sloader = env.dsa.service_loader;
     ui.label = sloader.load('dsa/services/ui/overlay/label', mq, env);    
     ui.button = sloader.load('dsa/services/ui/overlay/button', mq, env);    
     ui.entry = sloader.load('dsa/services/ui/overlay/entry', mq, env);
@@ -16,17 +17,14 @@ function pc(mq){
     ui.container = sloader.load('dsa/services/ui/overlay/container', mq, env);
     
     return  ui;
-//    var address_panel = sloader.load('sphere/ui/address_panel', mq, env);
-//    var action_panel = sloader.load('sphere/ui/action_panel', mq, env);
-//    var area = sloader.load('sphere/ui/area', mq, env);
-//    var objects_loader = sloader.load('sphere/objects_loader', mq, env);    
 }
 
 function elements_init(env, dsa, ll_widgets){
     var econstructors = env.sphere.parts.ui,
         elements = [];
-    for (constructor in econtstructors){
-	elements.push(econstructors.init(env, dsa, ll_widgets));
+    for (constructor in econstructors){
+	econstructors[constructor].init(env, dsa, ll_widgets);
+	elements.push(constructor);
     }
     return elements;
 }
@@ -38,7 +36,7 @@ exports.init = function(env, dsa){
 	   function(stack){
 	       var _mq;
 	       if('pc_style') //personal computer interface
-		   ll_widgets = pc(dsa.mq),
+		   ll_widgets = pc(env, dsa.mq),
 	       
 	       hl_elements = elements_init(env, dsa, ll_widgets);	       
 	   });

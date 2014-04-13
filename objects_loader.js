@@ -31,8 +31,8 @@ exports.init = function(send, react){
 
 //object is container for other object. May contain any number of any type objects
 
-exports.init = function(send, react){
-    react('update',
+exports.init = function(send, dsa.on){
+    dsa.on('update',
 	  function(client, element){
 
 	  },
@@ -44,14 +44,14 @@ exports.init = function(send, react){
 
 
 //object is representation of text within sphere
-exports.init = function(send, react){
-    react('update', 
+exports.init = function(send, dsa.on){
+    dsa.on('update', 
 	  function(client, data, element){
 	      //тут бы наверное не помешало бы переодически проверять как там наш объект в хранилище,
 	      //тем более, что всё что для этого надо, было передано в сообщении
 	      send('ui', 'fill_element', element, data);
 	  });
-    react('release',
+    dsa.on('release',
 	  function(client){
 	      //пока не совсем ясно надо ли вообще оно, релизить то, ведь редактировать это другое дело
 	      // обновление тоже, хотя если обновляется через таймер, то да, надо релизить, это точно
@@ -61,29 +61,28 @@ exports.init = function(send, react){
 */
 //object is representation of image within sphere
 
-exports.image = function(context, send, react, sequence){
-    react("init", 
-	 function(next, ui, element){
+function image (env, dsa){
+    dsa.on("image_init", 
+	   function(next, ui, element){
 	     context.set('element', element);
-	     context.set('ui', ui);
-	 });
-    react("update",
-	  function(next, data){
-	      send(context.get('ui'), 'fill_element', context.get('element'), data); 
-	  });
+	       context.set('ui', ui);
+	   });
+    dsa.on("image_update",
+	   function(next, data){
+	       send(context.get('ui'), 'fill_element', context.get('element'), data); 
+	   });
     
-    react("release",
-	  function(next){
+    dsa.on("image_release",
+	   function(next){
 //	      send(context.get)
 	  });
 }
 
-exports.init = function(env, context, send, react, sprout){
-    react("init", function(stack, ui){
+exports.init = function(env, dsa){
+    dsa.on("init", function(stack, ui){
 	     context.set('ui', ui); 
 	  });
-
-    react("load", function(stack, object_info, element){
+    dsa.on("load", function(stack, object_info, element){
 	      //необходимо подумать над изменяющимися данным с хранилище
 	      sequence(['s', 'dsa.storage', 'extract', object_info, { "type" : true, "data" : true}],
 		       ['ff', function(sequence, ret, next){

@@ -7,7 +7,15 @@
  */
 
 exports.init = function(env, dsa){
-    dsa.on('create', function(stack){
+    var _backend;
+    dsa.on('create', function(stack, backend){
+	       _backend = backend;
+	       console.log('backend is', backend);
+//    var address_panel = sloader.load('sphere/ui/address_panel', mq, env);
+//    var action_panel = sloader.load('sphere/ui/action_panel', mq, env);
+//    var area = sloader.load('sphere/ui/area', mq, env);
+//    var objects_loader = sloader.load('sphere/objects_loader', mq, env);    
+/*
 	       seq.run([{
 			    name : 'objects_loader',
 			    
@@ -25,6 +33,10 @@ exports.init = function(env, dsa){
 				}
 			    ]
 			}
-	    ]);    	       
+	    ]);    	       */
 	   });
+    
+    dsa.on('destroy',
+	  function(stack){
+	  });
 }
