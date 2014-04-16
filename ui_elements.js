@@ -38,7 +38,7 @@ exports.init = function(env, dsa){
 	       if('pc_style') //personal computer interface
 		   ll_widgets = pc(env, dsa.mq),
 	       
-	       hl_elements = elements_init(env, dsa, ll_widgets);	       
+	       hl_elements = elements_init(env, dsa, ll_widgets);
 	   });
 
     dsa.on('destroy', function(stack){

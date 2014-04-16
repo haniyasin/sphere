@@ -1,5 +1,5 @@
 /*
- * Implementation of ui menu abstaction. 
+ * Implementation of ui menu abstraction. 
  * 
  * Меню, в понимании этого сервиса это больше смысл, чем форма.
  * Это значит, что панель приборов, меню, всплывающее меню и все другие вещи, которые являются списком
@@ -17,5 +17,11 @@
  */
 
 exports.init = function(env, dsa, ui){
-    
+    dsa.on('menu_create',
+	  function(stack, info, add_to){
+	  })
+
+    dsa.on('menu_delete',
+	  function(stack, id){
+	  })
 }

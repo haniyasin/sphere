@@ -7,10 +7,54 @@
  */
 
 exports.init = function(env, dsa){
+    var ui;
     var _backend;
-    dsa.on('create', function(stack, backend){
+    dsa.on('create', 
+	   function(stack, ui, backend){
+	       ui = ui;
 	       _backend = backend;
 	       console.log('backend is', backend);
+	       dsa.sprout([
+			      ['sprout', 
+			       ['s', ui, 'card_create', {
+				    name : 'canvas'
+				}, 'main'],
+			       [
+				   ['sprout',
+				    ['s', ui, 'menu_create', {
+					 name : 'address'
+				     }, 'main'],
+				    [
+					['s', ui, 'part_create', {
+					     type : 'text_input',
+					     advetisement : 'type an address'
+					 }, 'address'],
+					['s', ui, 'part_create', {
+					     type : 'click_item',
+					     label : 'go'
+					 }, 'address']
+				    ]
+				   ]
+				   ,
+				   ['sprout',
+				    ['s', ui, 'menu_create', {
+					 name : 'actions'
+				     }, 'main'],
+				    [
+					['s', ui, 'part_create', {
+					     type : 'click_item',
+					     label : 'edit'
+					 }, 'actions'],
+					['s', ui, 'part_create', {
+					     type : 'click_item',
+					     label : 'create'
+					 }, 'actions']
+				    ]
+				   ]
+				   
+			       ]
+			      ]
+			  ]);
 //    var address_panel = sloader.load('sphere/ui/address_panel', mq, env);
 //    var action_panel = sloader.load('sphere/ui/action_panel', mq, env);
 //    var area = sloader.load('sphere/ui/area', mq, env);

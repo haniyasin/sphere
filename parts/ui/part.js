@@ -1,5 +1,5 @@
 /*
- * Implementation of part(element, item) abstaction
+ * Implementation of part(element, item) abstraction
  * 
  * Часть - это фрагмент menu или card. Каждая часть может занимать какое-то пространство, обозначаемое
  * числом от 1 до 10. Размер это всего лишь предпочитаемая величина. Помимо размера возможно назначить 
@@ -9,5 +9,11 @@
  */
 
 exports.init = function(env, dsa, ui){
-//    dsa.on(')
+    dsa.on('part_create',
+	  function(stack, info, add_to){
+	  })
+
+    dsa.on('part_delete',
+	  function(stack, id){
+	  })
 }
