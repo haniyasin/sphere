@@ -18,10 +18,10 @@
 
 exports.init = function(env, dsa, ui){
     dsa.on('menu_create',
-	  function(stack, info, add_to){
+	  function(sprout, stack, info, add_to){
 	  })
 
     dsa.on('menu_delete',
-	  function(stack, id){
+	  function(sprout, stack, id){
 	  })
 }

@@ -33,7 +33,7 @@ exports.init = function(env, dsa){
     var ll_widgets,
         hl_elements;
     dsa.on('init', 
-	   function(stack){
+	   function(sprout, stack){
 	       var _mq;
 	       if('pc_style') //personal computer interface
 		   ll_widgets = pc(env, dsa.mq),
@@ -41,6 +41,6 @@ exports.init = function(env, dsa){
 	       hl_elements = elements_init(env, dsa, ll_widgets);
 	   });
 
-    dsa.on('destroy', function(stack){
+    dsa.on('destroy', function(sprout, stack){
 	   });
 }

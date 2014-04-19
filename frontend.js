@@ -6,55 +6,48 @@
  * как frontend себя и backend для хранения и переработки совместно с другими frontend.
  */
 
+
+
+
 exports.init = function(env, dsa){
     var ui;
     var _backend;
     dsa.on('create', 
-	   function(stack, ui, backend){
+	   function(sprout, stack, ui, backend){
 	       ui = ui;
 	       _backend = backend;
-	       console.log('backend is', backend);
-	       dsa.sprout([
-			      ['sprout', 
-			       ['s', ui, 'card_create', {
-				    name : 'canvas'
-				}, 'main'],
-			       [
-				   ['sprout',
-				    ['s', ui, 'menu_create', {
-					 name : 'address'
-				     }, 'main'],
-				    [
-					['s', ui, 'part_create', {
-					     type : 'text_input',
-					     advetisement : 'type an address'
-					 }, 'address'],
-					['s', ui, 'part_create', {
-					     type : 'click_item',
-					     label : 'go'
-					 }, 'address']
-				    ]
-				   ]
-				   ,
-				   ['sprout',
-				    ['s', ui, 'menu_create', {
-					 name : 'actions'
-				     }, 'main'],
-				    [
-					['s', ui, 'part_create', {
-					     type : 'click_item',
-					     label : 'edit'
-					 }, 'actions'],
-					['s', ui, 'part_create', {
-					     type : 'click_item',
-					     label : 'create'
-					 }, 'actions']
-				    ]
-				   ]
-				   
-			       ]
-			      ]
-			  ]);
+
+	       with(dsa.sprout){
+		   msg(ui, 'card_create', {
+			   name : 'address'
+		       }, 'main').sprout(
+			   msg(ui, 'part_create', {
+				   type : 'text_input',
+				   size : 2,
+				   advetisement : 'type an address'
+			       }, 'address'),
+			   msg(ui, 'part_create', {
+				   type : 'click_item',
+				   size : 2,
+				   label : 'go'
+			       }, 'address')
+		       ).run();
+		   msg(ui, 'card_create', {
+			   name : 'actions'
+		       }, 'main').sprout(
+			   msg(ui, 'part_create', {
+				   type : 'click_item',
+				   size : 2,
+				   label : 'edit'
+			       }, 'actions'),
+			   msg(ui, 'part_create', {
+				   type : 'click_item',
+				   size : 2,
+				   label : 'create'
+			       }, 'actions')
+		       ).run();
+	       }
+
 //    var address_panel = sloader.load('sphere/ui/address_panel', mq, env);
 //    var action_panel = sloader.load('sphere/ui/action_panel', mq, env);
 //    var area = sloader.load('sphere/ui/area', mq, env);
@@ -81,6 +74,6 @@ exports.init = function(env, dsa){
 	   });
     
     dsa.on('destroy',
-	  function(stack){
+	  function(sprout, stack){
 	  });
 }

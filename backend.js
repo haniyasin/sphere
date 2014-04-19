@@ -9,10 +9,10 @@
 
 exports.init = function(env, dsa){
     dsa.on('create',
-	  function(stack){
+	  function(sprout, stack){
 	  })
 
     dsa.on('destroy',
-	  function(stack){
+	  function(sprout, stack){
 	  })
 }
