@@ -12,7 +12,7 @@ exports.init = function(env, dsa, ui){
         prev_card,
         cur_card,
         cur_layer,
-        offset = 0,
+        hoffset = 0,
     cur_x = 0;
     
     dsa.on('card_create', 
@@ -41,12 +41,15 @@ exports.init = function(env, dsa, ui){
 
 	       dsa.sprout.msg(ui.container, 'create', card.geometry).sprout(sprout).run(stack);
 	       stack['card'] = card.id;
+
 	       return true;	       
 	   });
 
-    dsa.on('card_get_offset', function(sprout, stack, size){
-	       stack['card_offset'] = offset;
-	       offset += size + 0.1;
+    dsa.on('card_get_hoffset', 
+	   function(sprout, stack, height){
+	       var block_size = dsa.context.get('block_size');
+	       stack['card_hoffset'] = hoffset;
+	       hoffset += height * block_size.height + block_size.height / 10;
 	   });
     dsa.on('card_delete', 
 	   function(sprout, stack, id){

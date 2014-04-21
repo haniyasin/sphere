@@ -11,12 +11,18 @@
 exports.init = function(env, dsa, ui){
     dsa.on('part_create',
 	  function(sprout, stack, info, add_to){
+	      var block_size = dsa.context.get('block_size');
+
 	      if(!info.hasOwnProperty('type')){
 		  console.log('type of part is not setted');
 		  return false;
 	      };
-	      if(!info.hasOwnProperty('size')){
-		  console.log('size of part is not setted');
+	      if(!info.hasOwnProperty('width')){
+		  console.log('width of part is not setted');
+		  return false;
+	      };
+	      if(!info.hasOwnProperty('height')){
+		  console.log('height of part is not setted');
 		  return false;
 	      };
 
@@ -27,15 +33,15 @@ exports.init = function(env, dsa, ui){
 		      stack['ui_service'] = ui.entry;
 		      stack['part'] = {
 			  x : '0%',
-			  width : '20%',
-			  height : (info.size * 10) + '%',
+			  width : (info.width * block_size.width) + 'px',
+			  height : (info.height * block_size.height)  + 'px',
 			  placeholder : info.advetisement
 		      };
 
-		      msg(dsa.context.service, 'card_get_offset', info.size).sprout(
+		      msg(dsa.context.service, 'card_get_hoffset', info.height).sprout(
 			  f(function(sprout, stack){
 				var info = stack.part;
-				info.y = (stack.card_offset * 10) + '%';
+				info.y = stack.card_hoffset  + 'px';
 				sprout.msg(stack.ui_service, 'create', info).run(stack);
 			    })
 		      ).run(stack);
@@ -48,15 +54,15 @@ exports.init = function(env, dsa, ui){
 		      stack['ui_service'] = ui.button;
 		      stack['part'] = {
 			  x : '0%',
-			  width : '20%',
-			  height : (info.size * 10) + '%',
+			  width : (info.width * block_size.width) + 'px',
+			  height : (info.height * block_size.height)  + 'px',
 			  label : info.label
 		      };
 
-		      msg(dsa.context.service, 'card_get_offset', info.size).sprout(
+		      msg(dsa.context.service, 'card_get_hoffset', info.height).sprout(
 			  f(function(sprout, stack){
 				var info = stack.part;
-				info.y = (stack.card_offset * 10) + '%';
+				info.y = stack.card_hoffset  + 'px';
 				sprout.msg(stack.ui_service, 'create', info).run(stack);
 			    })
 		      ).run(stack);

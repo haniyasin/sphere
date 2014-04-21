@@ -44,9 +44,10 @@ exports.init = function(env, dsa){
     dsa.on('destroy', function(sprout, stack){
 	   });
 
-    dsa.on('size_ask',
+    dsa.on('block_size_ask',
 	  function(sprout, stack){
-	      dsa.context.set('size', [40, 30]);
+	      dsa.context.set('block_size', { width : 40, height : 30 });
+	      return false; //because on_pressed is not working, bug in the dsa.
 	      with(dsa.sprout){
 		  msg(ll_widgets.container, 'create', {
 			  x : '15%',

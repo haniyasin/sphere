@@ -17,21 +17,22 @@ exports.init = function(env, dsa){
 	       ui = ui;
 	       _backend = backend;
 
-	       dsa.sprout.msg(ui, 'size_ask').run();
+	       dsa.sprout.msg(ui, 'block_size_ask').run();
 
-	       return false;
 	       with(dsa.sprout){
 		   msg(ui, 'card_create', {
 			   name : 'address'
 		       }, 'main').sprout(
 			   msg(ui, 'part_create', {
 				   type : 'text_input',
-				   size : 2,
+				   height : 1,
+				   width : 5,
 				   advetisement : 'type an address'
 			       }, 'address'),
 			   msg(ui, 'part_create', {
 				   type : 'click_item',
-				   size : 2,
+				   height : 1,
+				   width : 4,
 				   label : 'go'
 			       }, 'address')
 		       ).run();
@@ -40,12 +41,14 @@ exports.init = function(env, dsa){
 		       }, 'main').sprout(
 			   msg(ui, 'part_create', {
 				   type : 'click_item',
-				   size : 2,
+				   height : 1,
+				   width : 4,
 				   label : 'edit'
 			       }, 'actions'),
 			   msg(ui, 'part_create', {
 				   type : 'click_item',
-				   size : 2,
+				   height : 1,
+				   width : 4,
 				   label : 'create'
 			       }, 'actions')
 		       ).run();
