@@ -8,7 +8,8 @@
 
 function pc(env, mq){
     var ui = {
-    }
+    };
+
     var sloader = env.dsa.service_loader;
     ui.label = sloader.load('dsa/services/ui/overlay/label', mq, env);    
     ui.button = sloader.load('dsa/services/ui/overlay/button', mq, env);    
@@ -34,7 +35,6 @@ exports.init = function(env, dsa){
         hl_elements;
     dsa.on('init', 
 	   function(sprout, stack){
-	       var _mq;
 	       if('pc_style') //personal computer interface
 		   ll_widgets = pc(env, dsa.mq),
 	       
@@ -43,4 +43,56 @@ exports.init = function(env, dsa){
 
     dsa.on('destroy', function(sprout, stack){
 	   });
+
+    dsa.on('size_ask',
+	  function(sprout, stack){
+	      dsa.context.set('size', [40, 30]);
+	      with(dsa.sprout){
+		  msg(ll_widgets.container, 'create', {
+			  x : '15%',
+			  y : '5%',
+			  width : '70%',
+			  height : '90%'
+		      }).sprout(
+			  msg(ll_widgets.label, 'create', {
+				  x : '0%',
+				  width : '100%',
+				  height : '30px',
+				  
+				  text : 'Выберите подходящий размер'
+			      }),
+			  msg(ll_widgets.button, 'create', {
+				  x : '0%',
+				  y : '30px',
+				  width : '120px',
+				  height : '30px',
+				  label : 'Такой',
+				  on_pressed : f(function(sprout, stack){
+						     console.log('dddddeeeee');
+						 })
+			      }),
+			  msg(ll_widgets.button, 'create', {
+				  x : '0%',
+				  y : '62px',
+				  width : '200px',
+				  height : '60px',
+				  label : 'Сякой'
+			      }),
+			  msg(ll_widgets.button, 'create', {
+				  x : '0%',
+				  y : '124px',
+				  width : '400px',
+				  height : '100px',
+				  label : 'Этакий'
+			      }),
+			  msg(ll_widgets.button, 'create', {
+				  x : '0%',
+				  y : '226px',
+				  width : '600px',
+				  height : '140px',
+				  label : 'Большой'
+			      })
+		      ).run();
+	      }
+	  });
 }

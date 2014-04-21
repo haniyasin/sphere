@@ -17,6 +17,9 @@ exports.init = function(env, dsa){
 	       ui = ui;
 	       _backend = backend;
 
+	       dsa.sprout.msg(ui, 'size_ask').run();
+
+	       return false;
 	       with(dsa.sprout){
 		   msg(ui, 'card_create', {
 			   name : 'address'
