@@ -12,22 +12,29 @@ exports.init = function(env, dsa, ui){
         prev_card,
         cur_card,
         cur_layer,
-        hoffset = 0,
+        cards = {},
     cur_x = 0;
     
     dsa.on('card_create', 
 	   function(sprout, stack, info){
-	       var card = {
-		   id : env.capsule.modules.uuid.generate_str(),
-		   geometry : {
-		       x : (cur_x += 20) + '%',
-		       y : '5%',
-		       width : '90%',
-		       height : '90%'
-		   },
-		   prev_sprout : [],
-		   sprout : []
-	       };
+	       var block_size = dsa.context.get('block_size');
+	       console.log(JSON.stringify(block_size));
+	       var id = env.capsule.modules.uuid.generate_str(),
+	           card = {
+		       geometry : {
+			   x : (cur_x += block_size.width) + 'px',
+			   y : block_size.height + 'px',
+			   width : '90%',
+			   height : '90%'
+		       },
+		       prev_sprout : [],
+		       sprout : [],
+		       cur_offset_x : 0,
+		       cur_offset_y : 0,
+		       cur_part_y : 0
+		   };
+
+	       cards[id] = card;
 
 	       if(typeof(cur_card) != 'undefined'){
 		   if(typeof(prev_card) != 'undefined')
@@ -39,17 +46,33 @@ exports.init = function(env, dsa, ui){
 
 	       cur_card = card;
 
+	       stack['card'] = id;
+
 	       dsa.sprout.msg(ui.container, 'create', card.geometry).sprout(sprout).run(stack);
-	       stack['card'] = card.id;
 
 	       return true;	       
 	   });
 
-    dsa.on('card_get_hoffset', 
+    dsa.on('card_get_position', 
 	   function(sprout, stack, height){
+	       var card = cards[stack['card']];
 	       var block_size = dsa.context.get('block_size');
-	       stack['card_hoffset'] = hoffset;
-	       hoffset += height * block_size.height + block_size.height / 10;
+
+	       stack['part_position'] = {};
+
+	       if(stack.part.hasOwnProperty('row') &&
+		  stack.part.row)
+		   card.cur_offset_x += stack.part.width + block_size.width / 10;
+	       else {
+		   card.cur_part_y = card.cur_offset_y;
+		   card.cur_offset_y = card.cur_part_y + stack.part.height + block_size.height / 10;
+	       }
+
+	       stack.part_position = {
+		   x : card.cur_offset_x,
+		   y : card.cur_part_y
+	       };
+
 	   });
     dsa.on('card_delete', 
 	   function(sprout, stack, id){

@@ -26,24 +26,33 @@ exports.init = function(env, dsa, ui){
 		  return false;
 	      };
 
+	      stack['part'] = {
+		  width : (info.width * block_size.width),
+		  height : (info.height * block_size.height)
+	      };
+
+	      if(info.hasOwnProperty('row'))
+		  stack.part.row = info.row;
+
+	      function ui_item_creator(sprout, stack){
+		  var info = stack.part;
+		  info.width += 'px';
+		  info.height += 'px';
+		  info.x = stack.part_position.x  + 'px';
+		  info.y = stack.part_position.y  + 'px';
+		  console.log(info.x, info.y);
+		  sprout.msg(stack.ui_service, 'create', info).run(stack);		  
+	      }
+
 	      switch(info.type){
 	      case 'text_input' :
 		  //something like a entry
 		  with(dsa.sprout){
 		      stack['ui_service'] = ui.entry;
-		      stack['part'] = {
-			  x : '0%',
-			  width : (info.width * block_size.width) + 'px',
-			  height : (info.height * block_size.height)  + 'px',
-			  placeholder : info.advetisement
-		      };
+		      stack.part.placeholder = info.advetisement;
 
-		      msg(dsa.context.service, 'card_get_hoffset', info.height).sprout(
-			  f(function(sprout, stack){
-				var info = stack.part;
-				info.y = stack.card_hoffset  + 'px';
-				sprout.msg(stack.ui_service, 'create', info).run(stack);
-			    })
+		      msg(dsa.context.service, 'card_get_position').sprout(
+			  f(ui_item_creator)
 		      ).run(stack);
 		  }
 		  break;
@@ -52,19 +61,11 @@ exports.init = function(env, dsa, ui){
 		  //button, list click item or something else
 		  with(dsa.sprout){
 		      stack['ui_service'] = ui.button;
-		      stack['part'] = {
-			  x : '0%',
-			  width : (info.width * block_size.width) + 'px',
-			  height : (info.height * block_size.height)  + 'px',
-			  label : info.label
-		      };
+		      stack.part.label = info.label;
+		      stack.part.on_pressed = info.on_pressed;
 
-		      msg(dsa.context.service, 'card_get_hoffset', info.height).sprout(
-			  f(function(sprout, stack){
-				var info = stack.part;
-				info.y = stack.card_hoffset  + 'px';
-				sprout.msg(stack.ui_service, 'create', info).run(stack);
-			    })
+		      msg(dsa.context.service, 'card_get_position').sprout(
+			  f(ui_item_creator)
 		      ).run(stack);
 		  }
 		  break;

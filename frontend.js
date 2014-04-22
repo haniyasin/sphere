@@ -28,13 +28,16 @@ exports.init = function(env, dsa){
 				   height : 1,
 				   width : 5,
 				   advetisement : 'type an address'
-			       }, 'address'),
+			       }),
 			   msg(ui, 'part_create', {
 				   type : 'click_item',
 				   height : 1,
 				   width : 4,
-				   label : 'go'
-			       }, 'address')
+				   label : 'go',
+				   on_pressed : [f(function(sprout, stack){
+						       console.log('eeeetttt');
+						   })]
+			       })
 		       ).run();
 		   msg(ui, 'card_create', {
 			   name : 'actions'
@@ -44,13 +47,14 @@ exports.init = function(env, dsa){
 				   height : 1,
 				   width : 4,
 				   label : 'edit'
-			       }, 'actions'),
+			       }),
 			   msg(ui, 'part_create', {
 				   type : 'click_item',
+				   row : true,
 				   height : 1,
 				   width : 4,
 				   label : 'create'
-			       }, 'actions')
+			       })
 		       ).run();
 	       }
 
