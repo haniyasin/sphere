@@ -17,45 +17,46 @@ exports.init = function(env, dsa){
 	       ui = ui;
 	       _backend = backend;
 
-	       dsa.sprout.msg(ui, 'block_size_ask').run();
-
 	       with(dsa.sprout){
-		   msg(ui, 'card_create', {
-			   name : 'address'
-		       }, 'main').sprout(
-			   msg(ui, 'part_create', {
-				   type : 'text_input',
-				   height : 1,
-				   width : 5,
-				   advetisement : 'type an address'
-			       }),
-			   msg(ui, 'part_create', {
-				   type : 'click_item',
-				   height : 1,
-				   width : 4,
-				   label : 'go',
-				   on_pressed : [f(function(sprout, stack){
-						       console.log('eeeetttt');
-						   })]
-			       })
-		       ).run();
-		   msg(ui, 'card_create', {
-			   name : 'actions'
-		       }, 'main').sprout(
-			   msg(ui, 'part_create', {
-				   type : 'click_item',
-				   height : 1,
-				   width : 4,
-				   label : 'edit'
-			       }),
-			   msg(ui, 'part_create', {
-				   type : 'click_item',
-				   row : true,
-				   height : 1,
-				   width : 4,
-				   label : 'create'
-			       })
-		       ).run();
+		   msg(ui, 'block_size_ask',
+ 		       msg(ui, 'card_create', {
+			       name : 'address'
+			   }, 'main').sprout(
+			       msg(ui, 'part_create', {
+				       type : 'text_input',
+				       height : 1,
+				       width : 5,
+				       advetisement : 'введите адрес'
+				   }),
+			       msg(ui, 'part_create', {
+				       type : 'click_item',
+				       height : 1,
+				       width : 2,
+				       label : 'go',
+				       on_pressed : [f(function(sprout, stack){
+							   console.log('go go go');       
+						       }),
+						     msg(ui, 'card_create', {
+							     name : 'actions'
+							 }, 'main').sprout(
+							     msg(ui, 'part_create', {
+								     type : 'click_item',
+								     height : 1,
+								     width : 2,
+								     label : 'edit'
+								 }),
+							     msg(ui, 'part_create', {
+								     type : 'click_item',
+								     row : true,
+								     height : 1,
+								     width : 2,
+								     label : 'create'
+								 })
+							 )
+						    ]
+				   })
+			   )
+		      ).run();
 	       }
 
 //    var address_panel = sloader.load('sphere/ui/address_panel', mq, env);

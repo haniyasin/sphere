@@ -12,7 +12,8 @@ function pc(env, mq){
 
     var sloader = env.dsa.service_loader;
     ui.label = sloader.load('dsa/services/ui/overlay/label', mq, env);    
-    ui.button = sloader.load('dsa/services/ui/overlay/button', mq, env);    
+    ui.button = sloader.load('dsa/services/ui/native/button', mq, env);
+//    ui.button = sloader.load('dsa/services/ui/overlay/button', mq, env); overlay    
     ui.entry = sloader.load('dsa/services/ui/overlay/entry', mq, env);
     ui.panel = sloader.load('dsa/services/ui/overlay/panel', mq, env);
     ui.container = sloader.load('dsa/services/ui/overlay/container', mq, env);
@@ -45,9 +46,12 @@ exports.init = function(env, dsa){
 	   });
 
     dsa.on('block_size_ask',
-	  function(sprout, stack){
+	  function(sprout, stack, sprout_after_ask){
 	      dsa.context.set('block_size', { width : 40, height : 30 });
-	      return false; //because on_pressed is not working, bug in the dsa.
+	      var _stack = [];
+	      _stack.context = dsa.context.service;
+	      _stack.next_sprout = sprout_after_ask;
+//	      alert(sprout_after_ask);
 	      with(dsa.sprout){
 		  msg(ll_widgets.container, 'create', {
 			  x : '15%',
@@ -68,32 +72,59 @@ exports.init = function(env, dsa){
 				  width : '120px',
 				  height : '30px',
 				  label : 'Такой',
-				  on_pressed : f(function(sprout, stack){
-						     console.log('dddddeeeee');
-						 })
+				  on_pressed : [f(function(sprout, stack){
+						      sprout.msg(stack.context, 'set', 'block_size', 
+								 { width : 120, 
+								   height : 30 }).sprout(
+								       stack.next_sprout
+								   ).run();
+						 })]
 			      }),
 			  msg(ll_widgets.button, 'create', {
 				  x : '0%',
 				  y : '62px',
 				  width : '200px',
 				  height : '60px',
-				  label : 'Сякой'
+				  label : 'Сякой',
+				  on_pressed : [f(function(sprout, stack){
+						      sprout.msg(stack.context, 'set', 'block_size', 
+								 { width : 200, 
+								   height : 60 }).sprout(
+								       stack.next_sprout
+								   ).run();
+						 })]
 			      }),
 			  msg(ll_widgets.button, 'create', {
 				  x : '0%',
 				  y : '124px',
 				  width : '400px',
 				  height : '100px',
-				  label : 'Этакий'
+				  label : 'Этакий',
+				  on_pressed : [f(function(sprout, stack){
+						      sprout.msg(stack.context, 'set', 'block_size', 
+								 { width : 400, 
+								   height : 100 }).sprout(
+								       stack.next_sprout
+								   ).run();
+						 })]
+
 			      }),
 			  msg(ll_widgets.button, 'create', {
 				  x : '0%',
 				  y : '226px',
 				  width : '600px',
 				  height : '140px',
-				  label : 'Большой'
+				  label : 'Большой',
+				  on_pressed : [f(function(sprout, stack){
+						      sprout.msg(stack.context, 'set', 'block_size', 
+								 { width : 600, 
+								   height : 140 }).sprout(
+								       stack.next_sprout
+								   ).run();
+						 })]
+
 			      })
-		      ).run();
+		      ).run(_stack);
 	      }
 	  });
 }
