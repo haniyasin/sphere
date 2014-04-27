@@ -18,14 +18,13 @@ exports.init = function(env, dsa, ui){
     dsa.on('card_create', 
 	   function(sprout, stack, info){
 	       var block_size = dsa.context.get('block_size');
-	       console.log(JSON.stringify(block_size));
 	       var id = env.capsule.modules.uuid.generate_str(),
 	           card = {
 		       geometry : {
 			   x : (cur_x += block_size.width) + 'px',
 			   y : block_size.height + 'px',
-			   width : '90%',
-			   height : '90%'
+			   width : '80%',
+			   height : '80%'
 		       },
 		       prev_sprout : [],
 		       sprout : [],
@@ -33,7 +32,7 @@ exports.init = function(env, dsa, ui){
 		       cur_offset_y : 0,
 		       cur_part_y : 0
 		   };
-
+	       cur_x += block_size.width * 5;
 	       cards[id] = card;
 
 	       if(typeof(cur_card) != 'undefined'){

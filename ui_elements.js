@@ -53,6 +53,7 @@ exports.init = function(env, dsa){
 	      _stack.next_sprout = sprout_after_ask;
 //	      alert(sprout_after_ask);
 	      with(dsa.sprout){
+		  _stack.container = ll_widgets.container;
 		  msg(ll_widgets.container, 'create', {
 			  x : '15%',
 			  y : '5%',
@@ -76,8 +77,8 @@ exports.init = function(env, dsa){
 						      sprout.msg(stack.context, 'set', 'block_size', 
 								 { width : 120, 
 								   height : 30 }).sprout(
-								       stack.next_sprout
-								   ).run();
+								       sprout.msg(stack.container, 'destroy').sprout(stack.next_sprout)
+								   ).run(stack);
 						 })]
 			      }),
 			  msg(ll_widgets.button, 'create', {
@@ -90,8 +91,8 @@ exports.init = function(env, dsa){
 						      sprout.msg(stack.context, 'set', 'block_size', 
 								 { width : 200, 
 								   height : 60 }).sprout(
-								       stack.next_sprout
-								   ).run();
+								       sprout.msg(stack.container, 'destroy').sprout(stack.next_sprout)
+								   ).run(stack);
 						 })]
 			      }),
 			  msg(ll_widgets.button, 'create', {
@@ -104,8 +105,8 @@ exports.init = function(env, dsa){
 						      sprout.msg(stack.context, 'set', 'block_size', 
 								 { width : 400, 
 								   height : 100 }).sprout(
-								       stack.next_sprout
-								   ).run();
+								       sprout.msg(stack.container, 'destroy').sprout(stack.next_sprout)
+								   ).run(stack);
 						 })]
 
 			      }),
@@ -119,8 +120,8 @@ exports.init = function(env, dsa){
 						      sprout.msg(stack.context, 'set', 'block_size', 
 								 { width : 600, 
 								   height : 140 }).sprout(
-								       stack.next_sprout
-								   ).run();
+								       sprout.msg(stack.container, 'destroy').sprout(stack.next_sprout)
+								   ).run(stack);
 						 })]
 
 			      })

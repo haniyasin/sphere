@@ -40,7 +40,6 @@ exports.init = function(env, dsa, ui){
 		  info.height += 'px';
 		  info.x = stack.part_position.x  + 'px';
 		  info.y = stack.part_position.y  + 'px';
-		  console.log(info.x, info.y);
 		  sprout.msg(stack.ui_service, 'create', info).run(stack);		  
 	      }
 
