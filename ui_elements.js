@@ -40,6 +40,13 @@ exports.init = function(env, dsa){
 		   ll_widgets = pc(env, dsa.mq),
 	       
 	       hl_elements = elements_init(env, dsa, ll_widgets);
+	       dsa.sprout.msg(ll_widgets.container, 'create', {
+				  width : '100%',
+				  height : '100%'
+			      }).sprout(
+				  sprout
+			      ).run(stack);
+	       return true;
 	   });
 
     dsa.on('destroy', function(sprout, stack){

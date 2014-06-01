@@ -6,9 +6,6 @@
  * как frontend себя и backend для хранения и переработки совместно с другими frontend.
  */
 
-
-
-
 exports.init = function(env, dsa){
     var ui;
     var _backend;
@@ -32,7 +29,34 @@ exports.init = function(env, dsa){
 				       type : 'click_item',
 				       height : 1,
 				       width : 2,
-				       label : 'go',
+				       label : 'открыть',
+				       on_pressed : [f(function(sprout, stack){
+							   console.log('go go go');       
+						       }),
+						     msg(ui, 'card_create', {
+							     name : 'actions'
+							 }, 'main').sprout(
+							     msg(ui, 'part_create', {
+								     type : 'click_item',
+								     height : 1,
+								     width : 2,
+								     label : 'edit'
+								 }),
+							     msg(ui, 'part_create', {
+								     type : 'click_item',
+								     row : true,
+								     height : 1,
+								     width : 2,
+								     label : 'create'
+								 })
+							 )
+						    ]
+				   }),
+			       msg(ui, 'part_create', {
+				       type : 'click_item',
+				       height : 1,
+				       width : 2,
+				       label : 'новый',
 				       on_pressed : [f(function(sprout, stack){
 							   console.log('go go go');       
 						       }),
@@ -56,7 +80,7 @@ exports.init = function(env, dsa){
 						    ]
 				   })
 			   )
-		      ).run();
+		      ).run(stack);
 	       }
 
 //    var address_panel = sloader.load('sphere/ui/address_panel', mq, env);

@@ -50,7 +50,7 @@ exports.init = function(env, dsa, ui){
 		      stack['ui_service'] = ui.entry;
 		      stack.part.placeholder = info.advetisement;
 
-		      msg(dsa.context.service, 'card_get_position').sprout(
+		      msg(dsa.context.service, 'card_alloc_space').sprout(
 			  f(ui_item_creator)
 		      ).run(stack);
 		  }
@@ -63,7 +63,7 @@ exports.init = function(env, dsa, ui){
 		      stack.part.label = info.label;
 		      stack.part.on_pressed = info.on_pressed;
 
-		      msg(dsa.context.service, 'card_get_position').sprout(
+		      msg(dsa.context.service, 'card_alloc_space').sprout(
 			  f(ui_item_creator)
 		      ).run(stack);
 		  }

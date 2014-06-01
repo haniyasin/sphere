@@ -18,13 +18,20 @@ exports.init = function(env, dsa, ui){
     dsa.on('card_create', 
 	   function(sprout, stack, info){
 	       var block_size = dsa.context.get('block_size');
+	       //alert(JSON.stringify(stack.parent));
 	       var id = env.capsule.modules.uuid.generate_str(),
 	           card = {
 		       geometry : {
-			   x : (cur_x += block_size.width) + 'px',
-			   y : block_size.height + 'px',
-			   width : '80%',
-			   height : '80%'
+			   x : typeof cur_card == 'undefined' ? 0 : 
+			           cur_card.geometry.x + cur_card.geometry.width > 800 ? 0 :
+			           cur_card.geometry.x + cur_card.geometry.width
+			       + 'px',
+			   y : typeof cur_card == 'undefined' ? 0 : 
+			           cur_card.geometry.y + cur_card.geometry.height > 500 ? 0 :
+			           cur_card.geometry.y + cur_card.geometry.height
+			       + 'px',
+			   width : '100%', //нужно менять свой размер в card_alloc_space
+			   height : '100%'
 		       },
 		       prev_sprout : [],
 		       sprout : [],
@@ -32,7 +39,7 @@ exports.init = function(env, dsa, ui){
 		       cur_offset_y : 0,
 		       cur_part_y : 0
 		   };
-	       cur_x += block_size.width * 5;
+
 	       cards[id] = card;
 
 	       if(typeof(cur_card) != 'undefined'){
@@ -52,19 +59,32 @@ exports.init = function(env, dsa, ui){
 	       return true;	       
 	   });
 
-    dsa.on('card_get_position', 
+    dsa.on('card_alloc_space', 
 	   function(sprout, stack, height){
 	       var card = cards[stack['card']];
 	       var block_size = dsa.context.get('block_size');
 
 	       stack['part_position'] = {};
-
+	       var part_height = stack.part.height + block_size.height / 10;
 	       if(stack.part.hasOwnProperty('row') &&
-		  stack.part.row)
-		   card.cur_offset_x += stack.part.width + block_size.width / 10;
+		  stack.part.row){
+		   var part_width = stack.part.width + block_size.width/10;
+		   if(card.width <= card.cur_offset_x + stack.part.width + block_size.width / 10){
+		       card.cur_offset_x += part_width;
+		       card.width += part_width;   
+		   } else {
+		       if(card.width < part_width)
+			   card.width += part_width;   
+		       card.cur_offset_x = 0;
+		       card.cur_part_y = card.cur_offset_y;
+		       card.cur_offset_y += part_height;
+		       card.height += part_height;
+		   }		   
+	       }
 	       else {
 		   card.cur_part_y = card.cur_offset_y;
-		   card.cur_offset_y = card.cur_part_y + stack.part.height + block_size.height / 10;
+		   card.cur_offset_y += part_height;
+		   card.height += part_height;
 	       }
 
 	       stack.part_position = {
