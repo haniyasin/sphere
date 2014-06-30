@@ -7,15 +7,14 @@
  */
 
 exports.init = function(env, dsa){
-    var ui;
+    var ui = env.dsa.objects.ui;
     var _backend;
     dsa.on('create', 
-	   function(sprout, stack, ui, backend){
-	       ui = ui;
+	   function(sprout, stack, backend){
 	       _backend = backend;
-
-	       with(dsa.sprout){
-		   msg(ui, 'block_size_ask',
+	       ui.init('pc');
+	       ui.block_size_ask();
+/*	       
  		       msg(ui, 'card_create', {
 			       name : 'address'
 			   }, 'main').sprout(
@@ -81,7 +80,8 @@ exports.init = function(env, dsa){
 				   })
 			   )
 		      ).run(stack);
-	       }
+ 
+	   }
 
 //    var address_panel = sloader.load('sphere/ui/address_panel', mq, env);
 //    var action_panel = sloader.load('sphere/ui/action_panel', mq, env);
