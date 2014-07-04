@@ -8,20 +8,30 @@
 
 var ui = require('../dsa/objects/ui.js');
 
-function open_addr(stack){
-    
-}
-
 function address_requester(stack){
     with(ui.highlevel){
-	new card({ name : 'address' }, null, stack);
-	new entry({ name : 'addr',
-		    height : 1,
-		    width : 3,
-		    advertisement : 'введите адрес'
-		  }, null, stack);
+	var addr_card = new card({ name : 'address' }, null, stack);
+	var addr_entry;
+	function open_addr(stack){
+	    try{
+	//	alert('./objects/' + addr_entry.get_value() + '.js')
+		var sobject = require('./objects/' + addr_entry.get_value() + '.js');
+		addr_card.destroy();
+		new sobject();
+	    } catch (x) {
+		alert(JSON.stringify(x));
+		addr_entry.set_placeholder('такого объекта не существует');
+		addr_entry.set_value('');
+	    }
+	}
+	addr_entry = new entry({ name : 'addr',
+				     height : 1,
+				     width : 2,
+				     advertisement : 'введите адрес',
+				     on_text_change : function(){}
+				   }, null, stack);
 	new click({ height : 1,
-		    width : 2,
+		    width : 1,
 		    label : 'открыть',
 		    on_press : open_addr
 		  }, null, stack);
