@@ -28,12 +28,12 @@ function address_requester(stack){
 				     height : 1,
 				     width : 2,
 				     advertisement : 'введите адрес',
-				     on_text_change : function(){}
+				     on_text_change : open_addr
 				   }, null, stack);
 	new click({ height : 1,
 		    width : 1,
 		    label : 'открыть',
-		    on_press : open_addr
+		    on_click : open_addr
 		  }, null, stack);
     }
 }

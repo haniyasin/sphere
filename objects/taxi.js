@@ -2,103 +2,138 @@
  * Черновик приложения такси, реализующего два подприложения - одно для пассажира, а другое для перевозчика
  */
 
+var ui = require('../../dsa/objects/ui.js'),
+sloader = require('../../dsa/service_loader.js'),
+orders = sloader.load('sphere/objects/taxi/orders');
+
 function _send_order(sprout, stack){
     
 }
 
 function create_order(sprout, stack){
-    return new card(
+    stack = [];
+    
+    with(ui.highlevel){
+	new card({
+		     name : 'order'
+		 }, null, stack);
 	new entry({
 		      height : 1,
-		      width : 5,
+		      width : 2,
 		      advertisement : 'откуда'
-		  }),
+		  }, null, stack);
 	new entry({
 		      height : 1,
-		      width : 5,
+		      width : 2,
 		      advertisement : 'куда'
-		  }),
+		  }, null, stack),
 	new entry({
 		      height : 1,
-		      width : 3,
+		      width : 1,
 		      advertisement : 'сколько'
-		  }),
+		  }, null, stack),
 	new entry({
 		      height : 1,
-		      width : 5,
+		      width : 1,
 		      advertisement : 'когда'
-		  }),
-	new click_item({
-			   height : 1,
-			   width : 2,
-			   label : 'заказать',
-			   on_click : _send_order
-		       })
-    );    
+		  }, null, stack),
+	new click({
+		      height : 1,
+		      width : 1,
+		      label : 'заказать',
+		      on_click : _send_order
+		  }, null, stack);
+    }
+}
+
+function order_item(stack, order_info){
+    with(ui.highlevel){	
+	new click({
+		      width : 2,
+		      height : 1,
+		      label : 'от [' + order_info.from + '] до [' + order_info.to + '] за [' + order_info.money + ']',
+		      on_click : function(){}
+		  }, null, stack)
+    }
 }
 
 function passenger(sprout, stack){
-    var orders;
+    stack = [];
 
-    return new card(
-	new label({
-		      height : 2,
-		      width : 5,
+    with(ui.highlevel){
+	new card({
+		     name : 'passenger'
+		 }, null, stack);
+	
+	new text({
+		      height : 1,
+		      width : 2,
 		      text : 'мои заказы'
-		  }),
-	new click_item({
+		  }, null ,stack),
+	new click({
 			   height : 1,
-			   width : 5,
+			   width : 2,
 			   label : 'создать новый',
 			   on_click : create_order 
-		       }),
-	msg(orders, 'get_orders_by_id', myid).sprout(
-	    f(function(sprout, stack){
-		  for(order_id in stack.orders){
-		      new passenger_order(stack.orders[order_id]);
-		  }
-	      })
-	),
-	msg(orders, 'subscribe_on_orders_by_id')
-    )
-
+		       }, null, stack);	
+    }
+    
+    msg(orders, 'get_orders_by_id', 'myid').sprout(
+	f(function(sprout, stack){
+	      for(order_id in stack.orders){
+		  p_order_item(stack, stack.orders[order_id]);
+	      }
+	  })
+    ).run(stack);
+    msg(orders, 'subscribe', 'myid').run(stack);
 }
 
 function taxi(sprout, stack){
-    var order_list, order;
-    return new card(
-	new label({
-		      height : 2,
-		      width : 6,
+    stack = [];
+    with(ui.highlevel){
+	new card( {
+		      name : 'taxi'
+		  }, null , stack);
+	new text({
+		      height : 1,
+		      width : 2,
 		      text : 'список заказов'
-		  }),
-	msg(orders, 'get_orders').sprout(
-	    f(function(sprout, stack){
-		  for(order_id in stack.orders){
-		      new taxi_order(stack.orders[order_id]);
-		  }
-	      })
-	)
-    );    
+		  },null, stack);	
+    }
+
+ //   msg(orders, 'get_orders').sprout(
+//	    f(function(sprout, stack){
+//		  for(order_id in stack.orders){
+//		      new taxi_order(stack.orders[order_id]);
+//		  }
+//	      })
+//	)
+//    );    
 }
 
-exports.init = function(env, dsa){
-    dsa.on('create', function(sprout, stack){
-	       var sub_app_chooser = new card(
-		   new click_item({
-				      height : 2,
-				      width : 4,
-				      label : 'пассажир',
-				      on_click : passenger
-				  }),
-		   new click_item({
-				      height : 2,
-				      width : 4,
-				      label : 'перевозчик',
-				      on_click : taxi
-				  })
-	       );
-	   });
-    dsa.on('destroy', function(sprout, stack){
-	   });
-}
+module.exports = function(dsa, stack){
+    stack = [];
+//    alert('ddddd');
+    with(ui.highlevel){
+	var sub_app_chooser = new card( {
+					    name : "app_chooser"
+					}, null, stack);
+	new click({
+		      height : 2,
+		      width : 2,
+		      label : 'пассажир',
+		      on_click : function(){sub_app_chooser.destroy();passenger();}
+		  }, null, stack);
+	new click({
+		      height : 2,
+		      width : 2,
+		      label : 'перевозчик',
+		      on_click : function(){sub_app_chooser.destroy();taxi();}
+		  }, null, stack);
+
+    };
+	
+    this.destroy = function(){
+    };
+};
+
