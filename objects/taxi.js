@@ -3,8 +3,7 @@
  */
 
 var ui = require('../../dsa/objects/ui.js'),
-sloader = require('../../dsa/service_loader.js'),
-orders = sloader.load('sphere/objects/taxi/orders');
+dsa = require('../../dsa/init.js');
 
 function _send_order(sprout, stack){
     
@@ -58,6 +57,7 @@ function order_item(stack, order_info){
 }
 
 function passenger(sprout, stack){
+    var orders = dsa.get('sphere/objects/taxi/orders');
     stack = [];
 
     with(ui.highlevel){
@@ -78,17 +78,19 @@ function passenger(sprout, stack){
 		       }, null, stack);	
     }
     
-    msg(orders, 'get_orders_by_id', 'myid').sprout(
-	f(function(sprout, stack){
-	      for(order_id in stack.orders){
-		  p_order_item(stack, stack.orders[order_id]);
-	      }
-	  })
+    stack.order_item = order_item;
+    orders.get_orders_by_id('myid').sprout(
+	dsa.seq.f(function(sprout, stack){
+		      for(order_id in stack.orders){
+			  stack.order_item(stack, stack.orders[order_id]);
+		      }
+		  })
     ).run(stack);
-    msg(orders, 'subscribe', 'myid').run(stack);
+    orders.subscribe('myid').run();
 }
 
 function taxi(sprout, stack){
+    var orders = dsa.get('sphere/objects/taxi/orders');
     stack = [];
     with(ui.highlevel){
 	new card( {

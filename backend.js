@@ -7,7 +7,7 @@
  * используя сферу подобно обычному вебсайту и для тех же целей)
  */
 
-exports.init = function(env, dsa){
+exports.init = function(dsa){
     dsa.on('create',
 	  function(sprout, stack){
 	  })

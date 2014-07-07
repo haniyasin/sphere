@@ -38,7 +38,7 @@ function address_requester(stack){
     }
 }
 
-exports.init = function(env, dsa){
+exports.init = function(dsa){
     var _backend;
     dsa.on('create', 
 	   function(sprout, stack, backend){

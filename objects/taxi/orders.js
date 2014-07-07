@@ -1,4 +1,4 @@
-exports.init = function(env, dsa){
+exports.init = function(dsa){
     dsa.on('create', function(sprout ,stack){
 	   });
     dsa.on('destroy', function(sprout, stack){
