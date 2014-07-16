@@ -1,46 +1,50 @@
 /*
  * Черновик приложения такси, реализующего два подприложения - одно для пассажира, а другое для перевозчика
  */
-
-var ui = require('../../dsa/objects/ui.js'),
-dsa = require('../../dsa/init.js');
-
-function _send_order(sprout, stack){
-    
-}
+var uuid = require('../../modules/uuid.js'),
+ui = require('../../dsa/objects/ui.js'),
+dsa = require('../../dsa/init.js'),
+orders = dsa.get('sphere/objects/taxi/orders');
 
 function create_order(sprout, stack){
-    stack = [];
-    
     with(ui.highlevel){
 	new card({
 		     name : 'order'
 		 }, null, stack);
-	new entry({
-		      height : 1,
-		      width : 2,
-		      advertisement : 'откуда'
-		  }, null, stack);
-	new entry({
-		      height : 1,
-		      width : 2,
-		      advertisement : 'куда'
-		  }, null, stack),
-	new entry({
-		      height : 1,
-		      width : 1,
-		      advertisement : 'сколько'
-		  }, null, stack),
-	new entry({
-		      height : 1,
-		      width : 1,
-		      advertisement : 'когда'
-		  }, null, stack),
+	var _from = new entry({
+				  height : 1,
+				  width : 2,
+				  advertisement : 'откуда'
+			      }, null, stack),
+	_to = new entry({
+			    height : 1,
+			    width : 2,
+			    advertisement : 'куда'
+			}, null, stack),
+	_money = new entry({
+			       height : 1,
+			       width : 1,
+			       advertisement : 'сколько'
+			   }, null, stack),
+	_when = new entry({
+			      height : 1,
+			      width : 1,
+			      advertisement : 'когда'
+			  }, null, stack);
 	new click({
 		      height : 1,
 		      width : 1,
 		      label : 'заказать',
-		      on_click : _send_order
+		      on_click : function(){
+			  //сделать проверку всех значений, to и from  это элементы списка
+			  orders.push_order({ 
+						id : uuid.generate_str(), 
+						to : _to.get_value(),
+		      				from : _from.get_value(),
+						money : _money.get_value(),
+						when : _when.get_value()
+					    }).run();   
+		      }
 		  }, null, stack);
     }
 }
@@ -57,9 +61,6 @@ function order_item(stack, order_info){
 }
 
 function passenger(sprout, stack){
-    var orders = dsa.get('sphere/objects/taxi/orders');
-    stack = [];
-
     with(ui.highlevel){
 	new card({
 		     name : 'passenger'
@@ -79,11 +80,14 @@ function passenger(sprout, stack){
     }
     
     stack.order_item = order_item;
-    orders.get_orders_by_id('myid').sprout(
+    orders.get_order_by_id('vah').sprout(
 	dsa.seq.f(function(sprout, stack){
-		      for(order_id in stack.orders){
-			  stack.order_item(stack, stack.orders[order_id]);
-		      }
+			  stack.order_item(stack, stack.order);
+		  })
+    ).run(stack);
+    orders.get_order_by_id('uhaha').sprout(
+	dsa.seq.f(function(sprout, stack){
+			  stack.order_item(stack, stack.order);
 		  })
     ).run(stack);
     orders.subscribe('myid').run();
@@ -114,23 +118,22 @@ function taxi(sprout, stack){
 }
 
 module.exports = function(dsa, stack){
-    stack = [];
-//    alert('ddddd');
+//    alert(stack.card + dsa + 'uhaha');
     with(ui.highlevel){
 	var sub_app_chooser = new card( {
 					    name : "app_chooser"
 					}, null, stack);
 	new click({
-		      height : 2,
+		      height : 1,
 		      width : 2,
 		      label : 'пассажир',
-		      on_click : function(){sub_app_chooser.destroy();passenger();}
+		      on_click : function(){passenger(null, stack);}
 		  }, null, stack);
 	new click({
-		      height : 2,
+		      height : 1,
 		      width : 2,
 		      label : 'перевозчик',
-		      on_click : function(){sub_app_chooser.destroy();taxi();}
+		      on_click : function(){taxi(null, stack);}
 		  }, null, stack);
 
     };

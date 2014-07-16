@@ -12,14 +12,14 @@ function address_requester(stack){
     with(ui.highlevel){
 	var addr_card = new card({ name : 'address' }, null, stack);
 	var addr_entry;
-	function open_addr(stack){
+	function open_addr(){
 	    try{
 	//	alert('./objects/' + addr_entry.get_value() + '.js')
 		var sobject = require('./objects/' + addr_entry.get_value() + '.js');
-		addr_card.destroy();
-		new sobject();
+//		addr_card.destroy();
+		new sobject(null, stack);
 	    } catch (x) {
-		alert(JSON.stringify(x));
+		alert(JSON.stringify(x) + 'ddddd');
 		addr_entry.set_placeholder('такого объекта не существует');
 		addr_entry.set_value('');
 	    }
