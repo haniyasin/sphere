@@ -8,10 +8,10 @@ orders = dsa.get('sphere/objects/taxi/orders');
 
 function create_order(sprout, stack){
     with(ui.highlevel){
-	new card({
-		     name : 'order'
-		 }, null, stack);
-	var _from = new entry({
+	var new_order = new card({
+		     name : 'new_order'
+		 }, null, stack),
+	_from = new entry({
 				  height : 1,
 				  width : 2,
 				  advertisement : 'откуда'
@@ -37,13 +37,17 @@ function create_order(sprout, stack){
 		      label : 'заказать',
 		      on_click : function(){
 			  //сделать проверку всех значений, to и from  это элементы списка
-			  orders.push_order({ 
-						id : uuid.generate_str(), 
-						to : _to.get_value(),
-		      				from : _from.get_value(),
-						money : _money.get_value(),
-						when : _when.get_value()
-					    }).run();   
+			  var order_info = { 
+			      id : uuid.generate_str(), 
+			      to : _to.get_value(),
+		      	      from : _from.get_value(),
+			      money : _money.get_value(),
+			      when : _when.get_value()
+			  };
+			  orders.push_order(order_info).run();
+			  stack.passenger.make_current(stack);
+			  order_item(stack, order_info);
+			  new_order.make_current(stack);
 		      }
 		  }, null, stack);
     }
@@ -55,16 +59,38 @@ function order_item(stack, order_info){
 		      width : 2,
 		      height : 1,
 		      label : 'от [' + order_info.from + '] до [' + order_info.to + '] за [' + order_info.money + ']',
-		      on_click : function(){}
+		      on_click : function(sprout, stack){
+			  new card({ name : 'order'}, null, stack);
+			  new text({ 
+				       height : 1,
+				       width : 1,
+				       text : 'откуда -' + order_info.from }, null, stack);
+			  new text({ 
+				       height : 1,
+				       width : 1,
+				       text : 'куда -' + order_info.to }, null, stack);
+			  new text({ 
+				       height : 1,
+				       width : 1,
+				       text : 'цена -' + order_info.money }, null, stack);
+			  new text({ 
+				       height : 1,
+				       width : 1,
+				       text : 'когда -' + order_info.when }, null, stack);
+			  new click( { 
+					 height : 1,
+					 width : 1,
+					 label : 'изменить' }, null, stack ); 			     
+		      }
 		  }, null, stack)
     }
 }
 
 function passenger(sprout, stack){
     with(ui.highlevel){
-	new card({
-		     name : 'passenger'
-		 }, null, stack);
+	stack.passenger = new card({
+				       name : 'passenger'
+				   }, null, stack);
 	
 	new text({
 		      height : 1,
@@ -82,20 +108,47 @@ function passenger(sprout, stack){
     stack.order_item = order_item;
     orders.get_order_by_id('vah').sprout(
 	dsa.seq.f(function(sprout, stack){
-			  stack.order_item(stack, stack.order);
+		      stack.order_item(stack, stack.order);
 		  })
     ).run(stack);
-    orders.get_order_by_id('uhaha').sprout(
-	dsa.seq.f(function(sprout, stack){
-			  stack.order_item(stack, stack.order);
-		  })
-    ).run(stack);
+
     orders.subscribe('myid').run();
 }
 
+function taxi_order(stack, order_info){
+    with(ui.highlevel){	
+	new click({
+		      width : 2,
+		      height : 1,
+		      label : 'от [' + order_info.from + '] до [' + order_info.to + '] за [' + order_info.money + ']',
+		      on_click : function(sprout, stack){
+			  new card({ name : 'order'}, null, stack);
+			  new text({ 
+				       height : 1,
+				       width : 1,
+				       text : 'откуда -' + order_info.from }, null, stack);
+			  new text({ 
+				       height : 1,
+				       width : 1,
+				       text : 'куда -' + order_info.to }, null, stack);
+			  new text({ 
+				       height : 1,
+				       width : 1,
+				       text : 'цена -' + order_info.money }, null, stack);
+			  new text({ 
+				       height : 1,
+				       width : 1,
+				       text : 'когда -' + order_info.when }, null, stack);
+			  new click( { 
+					 height : 1,
+					 width : 1,
+					 label : 'изменить' }, null, stack ); 			     
+		      }
+		  }, null, stack)
+    }    
+}
+
 function taxi(sprout, stack){
-    var orders = dsa.get('sphere/objects/taxi/orders');
-    stack = [];
     with(ui.highlevel){
 	new card( {
 		      name : 'taxi'
@@ -107,18 +160,22 @@ function taxi(sprout, stack){
 		  },null, stack);	
     }
 
- //   msg(orders, 'get_orders').sprout(
-//	    f(function(sprout, stack){
-//		  for(order_id in stack.orders){
-//		      new taxi_order(stack.orders[order_id]);
-//		  }
-//	      })
-//	)
-//    );    
+    stack.taxi_order = taxi_order;
+    orders.get_orders().sprout(
+	dsa.seq.f(function(sprout, stack){
+		      for(item in stack.orders){
+			  stack.taxi_order(stack, stack.orders[item]);
+		      }
+		  })
+    ).run(stack);
+
+    orders.subscribe('new_order').sprout(
+	dsa.seq.f(function(sprout, stack){
+		  })
+    ).run(stack);    
 }
 
 module.exports = function(dsa, stack){
-//    alert(stack.card + dsa + 'uhaha');
     with(ui.highlevel){
 	var sub_app_chooser = new card( {
 					    name : "app_chooser"
