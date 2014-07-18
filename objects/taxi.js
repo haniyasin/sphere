@@ -111,8 +111,6 @@ function passenger(sprout, stack){
 		      stack.order_item(stack, stack.order);
 		  })
     ).run(stack);
-
-    orders.subscribe('myid').run();
 }
 
 function taxi_order(stack, order_info){
@@ -149,10 +147,12 @@ function taxi_order(stack, order_info){
 }
 
 function taxi(sprout, stack){
+    var taxi_card;
+
     with(ui.highlevel){
-	new card( {
-		      name : 'taxi'
-		  }, null , stack);
+	taxi_card = new card( {
+				  name : 'taxi'
+			      }, null , stack);
 	new text({
 		      height : 1,
 		      width : 2,
@@ -168,11 +168,15 @@ function taxi(sprout, stack){
 		      }
 		  })
     ).run(stack);
+    
+    orders.on_subscribe = function(sprout, stack){
+	alert(JSON.stringify(stack.order));
+	taxi_card.make_current(stack);
+	taxi_order(stack, stack.order);
+//	stack.prev_card.make_current();
+    };
 
-    orders.subscribe('new_order').sprout(
-	dsa.seq.f(function(sprout, stack){
-		  })
-    ).run(stack);    
+    orders.subscribe('_new').run(stack);    
 }
 
 module.exports = function(dsa, stack){

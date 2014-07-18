@@ -1,7 +1,10 @@
 var orders = [    
 ],
 subscribers = {
-    
+    _new : [],
+    changed : [],
+    removed : [],
+    taken : []
 };
 
 orders["vah"] = {
@@ -25,6 +28,12 @@ exports.init = function(dsa){
 	   });
     dsa.on('push_order', function(sprout, stack, order){
 	       orders[order.id] = order;
+	       for(key in subscribers._new){
+	       	   stack.order = order;
+		   dsa.sprout.run(subscribers._new[key], stack);
+	       }
+//	       dsa.sprout.run(sprout, stack);
+
 //	       var update_obj = {
 //	       };
 //	       update_obj[order.id] = order;
@@ -64,6 +73,10 @@ exports.init = function(dsa){
      * + order is removed(by passenger) 
      */
     dsa.on('subscribe', function(sprout, stack, event, id){
-	       
+	       if(subscribers.hasOwnProperty(event)){
+		   subscribers[event].push(sprout);
+	       } else
+		   console.log('event with that name is unexist');
+	       return true;
 	   });
-}
+};
