@@ -8,6 +8,7 @@
 
 var ui = require('../dsa/objects/ui.js');
 
+/* It is disabled now, but can be use for unusual cases
 function address_requester(stack){
     with(ui.highlevel){
 	var addr_card = new card({ name : 'address' }, null, stack);
@@ -38,14 +39,37 @@ function address_requester(stack){
     }
 }
 
+*/
+
+function objects_chooser(stack){
+    var objects = require('./objects/list.js');
+    with(ui.highlevel){
+	var chooser = new card({ name : 'objects_chooser' }, null, stack);
+	for(key in objects){
+	    if(objects[key] == 'file'){
+		new click({ height : 1,
+			    width : 1,
+			    label : key,
+			    on_click : (function(key){
+					    return function(){
+						var sobject = require('./objects/' + key + '.js');
+						new sobject(null, stack);
+					    };
+					})(key)
+			  }, null, stack);		
+	    }
+	}	
+    }
+}
+
 exports.init = function(dsa){
     var _backend;
     dsa.on('create', 
 	   function(sprout, stack, backend){
 	       _backend = backend;
 	       ui.init('pc');
-	       ui.block_size_ask(address_requester);
-
+//	       ui.block_size_ask(address_requester);
+	       ui.block_size_ask(objects_chooser);
 //    var address_panel = sloader.load('sphere/ui/address_panel', mq, env);
 //    var action_panel = sloader.load('sphere/ui/action_panel', mq, env);
 //    var area = sloader.load('sphere/ui/area', mq, env);
