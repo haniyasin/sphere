@@ -1,6 +1,7 @@
 /*
  * Черновик приложения такси, реализующего два подприложения - одно для пассажира, а другое для перевозчика
  */
+
 var uuid = require('../../modules/uuid.js'),
 ui = require('../../dsa/objects/ui.js'),
 dsa = require('../../dsa/init.js'),
@@ -47,7 +48,7 @@ function create_order(sprout, stack){
 			  orders.push_order(order_info).run();
 			  stack.passenger.make_current(stack);
 			  order_item(stack, order_info);
-			  new_order.make_current(stack);
+			  new_order.destroy(stack);
 		      }
 		  }, null, stack);
     }
@@ -91,7 +92,9 @@ function passenger(sprout, stack){
 	stack.passenger = new card({
 				       name : 'passenger'
 				   }, null, stack);
-	
+	if(typeof stack.passenger.old != 'undefined')
+	    return;
+
 	new text({
 		      height : 1,
 		      width : 2,
@@ -120,7 +123,10 @@ function taxi_order(stack, order_info){
 		      height : 1,
 		      label : 'от [' + order_info.from + '] до [' + order_info.to + '] за [' + order_info.money + ']',
 		      on_click : function(sprout, stack){
-			  new card({ name : 'order'}, null, stack);
+			  var order_card = new card({ name : 'order' + order_info.from}, null, stack);
+			  if(typeof order_card.old != 'undefined')
+			      return;
+
 			  new text({ 
 				       height : 1,
 				       width : 1,
@@ -153,6 +159,9 @@ function taxi(sprout, stack){
 	taxi_card = new card( {
 				  name : 'taxi'
 			      }, null , stack);
+	if(typeof taxi_card.old != 'undefined')
+	    return;
+
 	new text({
 		      height : 1,
 		      width : 2,
@@ -170,7 +179,6 @@ function taxi(sprout, stack){
     ).run(stack);
     
     orders.on_subscribe = function(sprout, stack){
-	alert(JSON.stringify(stack.order));
 	taxi_card.make_current(stack);
 	taxi_order(stack, stack.order);
 //	stack.prev_card.make_current();
@@ -184,6 +192,9 @@ module.exports = function(dsa, stack){
 	var sub_app_chooser = new card( {
 					    name : "app_chooser"
 					}, null, stack);
+	if(typeof sub_app_chooser.old != 'undefined')
+	    return;
+
 	new click({
 		      height : 1,
 		      width : 2,
