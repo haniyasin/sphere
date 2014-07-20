@@ -3,7 +3,8 @@
  */
 
 module.exports = {
-    portal : 'file',
+//   portal : 'file',
     taxi : 'file',
-    welcome : 'file'
+    remont : 'file'
+//    welcome : 'file'
 };

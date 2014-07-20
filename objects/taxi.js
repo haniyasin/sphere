@@ -7,51 +7,63 @@ ui = require('../../dsa/objects/ui.js'),
 dsa = require('../../dsa/init.js'),
 orders = dsa.get('sphere/objects/taxi/orders');
 
-function create_order(sprout, stack){
+
+function edit_order_card(stack, defaults, click_label, click_callback){
     with(ui.highlevel){
 	var new_order = new card({
-		     name : 'new_order'
+		     name : 'edit_order'
 		 }, null, stack),
 	_from = new entry({
-				  height : 1,
-				  width : 2,
-				  advertisement : 'откуда'
-			      }, null, stack),
+			      height : 1,
+			      width : 2,
+			      advertisement : defaults.hasOwnProperty('from') ? defaults.from : 'откуда'
+			  }, null, stack),
 	_to = new entry({
 			    height : 1,
 			    width : 2,
-			    advertisement : 'куда'
+			    advertisement : defaults.hasOwnProperty('to') ? defaults.to : 'куда'
 			}, null, stack),
 	_money = new entry({
 			       height : 1,
 			       width : 1,
-			       advertisement : 'сколько'
+			       advertisement : defaults.hasOwnProperty('money') ? defaults.money: 'сколько'
 			   }, null, stack),
 	_when = new entry({
 			      height : 1,
 			      width : 1,
-			      advertisement : 'когда'
+			      advertisement : defaults.hasOwnProperty('when') ? defaults.when : 'когда'
 			  }, null, stack);
 	new click({
 		      height : 1,
-		      width : 1,
-		      label : 'заказать',
+		      width : 1,    
+		      label : click_label,
 		      on_click : function(){
-			  //сделать проверку всех значений, to и from  это элементы списка
-			  var order_info = { 
-			      id : uuid.generate_str(), 
+			  var order = { 
+			      id : defaults.hasOwnProperty('id') ? defaults.id : uuid.generate_str(), 
 			      to : _to.get_value(),
 		      	      from : _from.get_value(),
 			      money : _money.get_value(),
 			      when : _when.get_value()
 			  };
-			  orders.push_order(order_info).run();
-			  stack.passenger.make_current(stack);
-			  order_item(stack, order_info);
+
+			  for(key in defaults){
+			      if(order[key] == '')
+				  order[key] = defaults[key];
+			  }
+			  click_callback(order);
 			  new_order.destroy(stack);
 		      }
 		  }, null, stack);
     }
+}
+
+function create_order(sprout, stack){
+    edit_order_card(stack, {}, 'заказать', function(order){
+			  //сделать проверку всех значений, to и from  это элементы списка
+			  orders.push_order(order).run();
+			  stack.passenger.make_current(stack);
+			  order_item(stack, order);
+		      });
 }
 
 function order_item(stack, order_info){
@@ -61,7 +73,7 @@ function order_item(stack, order_info){
 		      height : 1,
 		      label : 'от [' + order_info.from + '] до [' + order_info.to + '] за [' + order_info.money + ']',
 		      on_click : function(sprout, stack){
-			  new card({ name : 'order'}, null, stack);
+			  new card({ name : 'porder_' + order_info.id}, null, stack);
 			  new text({ 
 				       height : 1,
 				       width : 1,
@@ -81,7 +93,13 @@ function order_item(stack, order_info){
 			  new click( { 
 					 height : 1,
 					 width : 1,
-					 label : 'изменить' }, null, stack ); 			     
+					 label : 'изменить',
+					 on_click : function(sprout, stack){
+					     edit_order_card(stack, order_info, 'изменить', function(order){
+								 orders.replace_order(order).run();
+							     });
+					 }
+				     }, null, stack ); 			     
 		      }
 		  }, null, stack)
     }
@@ -123,7 +141,7 @@ function taxi_order(stack, order_info){
 		      height : 1,
 		      label : 'от [' + order_info.from + '] до [' + order_info.to + '] за [' + order_info.money + ']',
 		      on_click : function(sprout, stack){
-			  var order_card = new card({ name : 'order' + order_info.from}, null, stack);
+			  var order_card = new card({ name : 'torder_' + order_info.id}, null, stack);
 			  if(typeof order_card.old != 'undefined')
 			      return;
 
@@ -146,7 +164,18 @@ function taxi_order(stack, order_info){
 			  new click( { 
 					 height : 1,
 					 width : 1,
-					 label : 'изменить' }, null, stack ); 			     
+					 label : 'согласиться',
+					 on_click : function(sprout, stack){
+					 }
+				     }, null, stack ); 			     
+			  new click( { 
+					 height : 1,
+					 width : 1,
+					 row : true,
+					 label : 'написать',
+					 on_click : function(sprout, stack){
+					 }
+				     }, null, stack ); 			     
 		      }
 		  }, null, stack)
     }    

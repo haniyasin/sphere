@@ -7,16 +7,18 @@ var orders = [
 ];
 
 orders["vah"] = {
+    id : 'vah',
     to : 'pio',
     from : 'mega',
-    money : 80,
+    money : '80',
     when : '161210072014'
 };
 
 orders["ptah"] = {
+    id : 'ptah',
     to : 'zbi',
     from : 'uralmash',
-    money : 100,
+    money : '100',
     when : '173010072014'
 };
 
@@ -59,8 +61,8 @@ exports.init = function(dsa){
 	       //	       msg(storage, 'update', order.geo_id, update_obj); 
 	   });
 
-    dsa.on('replace_order', function(sprout, stack, id, order){
-	       orders[id] = order;
+    dsa.on('replace_order', function(sprout, stack, order){
+	       orders[order.id] = order;
 	       stack.order = order;
 	       events.emit('replace', stack);
 	   });
