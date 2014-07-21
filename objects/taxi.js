@@ -4,35 +4,60 @@
 
 var uuid = require('../../modules/uuid.js'),
 ui = require('../../dsa/objects/ui.js'),
-dsa = require('../../dsa/init.js'),
-orders = dsa.get('sphere/objects/taxi/orders');
+dsa = require('../../dsa/init.js');
 
+/*
+ * passenger app
+ */
+
+var porders = dsa.get('sphere/objects/taxi/orders'); //instance for using by passenger app
 
 function edit_order_card(stack, defaults, click_label, click_callback){
     with(ui.highlevel){
 	var new_order = new card({
 		     name : 'edit_order'
-		 }, null, stack),
-	_from = new entry({
-			      height : 1,
-			      width : 2,
-			      advertisement : defaults.hasOwnProperty('from') ? defaults.from : 'откуда'
-			  }, null, stack),
-	_to = new entry({
-			    height : 1,
-			    width : 2,
-			    advertisement : defaults.hasOwnProperty('to') ? defaults.to : 'куда'
-			}, null, stack),
-	_money = new entry({
-			       height : 1,
-			       width : 1,
-			       advertisement : defaults.hasOwnProperty('money') ? defaults.money: 'сколько'
-			   }, null, stack),
-	_when = new entry({
-			      height : 1,
-			      width : 1,
-			      advertisement : defaults.hasOwnProperty('when') ? defaults.when : 'когда'
-			  }, null, stack);
+		 }, null, stack);
+
+	var entry_def = {
+	    height : 1,
+	    width : 2
+	};
+	if(!defaults.hasOwnProperty('from'))
+	    entry_def.advertisement = 'откуда';
+	else
+	    entry_def.text = defaults.from;
+	var _from = new entry(entry_def, null, stack);
+
+	entry_def = {
+	    height : 1,
+	    width : 2
+	};
+	if(!defaults.hasOwnProperty('to'))
+	    entry_def.advertisement = 'куда';
+	else
+	    entry_def.text = defaults.to;
+	var _to = new entry(entry_def, null, stack);
+
+	entry_def = {
+	    height : 1,
+	    width : 2
+	};
+	if(!defaults.hasOwnProperty('money'))
+	    entry_def.advertisement = 'сколько';
+	else
+	    entry_def.text = defaults.money;
+	var _money = new entry(entry_def, null, stack);
+
+	entry_def = {
+	    height : 1,
+	    width : 2
+	};
+	if(!defaults.hasOwnProperty('when'))
+	    entry_def.advertisement = 'когда';
+	else
+	    entry_def.text = defaults.when;
+	var _when = new entry(entry_def, null, stack);
+
 	new click({
 		      height : 1,
 		      width : 1,    
@@ -60,7 +85,7 @@ function edit_order_card(stack, defaults, click_label, click_callback){
 function create_order(sprout, stack){
     edit_order_card(stack, {}, 'заказать', function(order){
 			  //сделать проверку всех значений, to и from  это элементы списка
-			  orders.push_order(order).run();
+			  porders.push_order(order).run();
 			  stack.passenger.make_current(stack);
 			  order_item(stack, order);
 		      });
@@ -68,40 +93,46 @@ function create_order(sprout, stack){
 
 function order_item(stack, order_info){
     with(ui.highlevel){	
-	new click({
-		      width : 2,
-		      height : 1,
-		      label : 'от [' + order_info.from + '] до [' + order_info.to + '] за [' + order_info.money + ']',
-		      on_click : function(sprout, stack){
-			  new card({ name : 'porder_' + order_info.id}, null, stack);
-			  new text({ 
-				       height : 1,
-				       width : 1,
-				       text : 'откуда -' + order_info.from }, null, stack);
-			  new text({ 
-				       height : 1,
-				       width : 1,
-				       text : 'куда -' + order_info.to }, null, stack);
-			  new text({ 
-				       height : 1,
-				       width : 1,
-				       text : 'цена -' + order_info.money }, null, stack);
-			  new text({ 
-				       height : 1,
-				       width : 1,
-				       text : 'когда -' + order_info.when }, null, stack);
-			  new click( { 
-					 height : 1,
-					 width : 1,
-					 label : 'изменить',
-					 on_click : function(sprout, stack){
-					     edit_order_card(stack, order_info, 'изменить', function(order){
-								 orders.replace_order(order).run();
-							     });
-					 }
-				     }, null, stack ); 			     
-		      }
-		  }, null, stack)
+	var order_click = new click(
+	    {
+		width : 2,
+		height : 1,
+		label : 'от [' + order_info.from + '] до [' + order_info.to + '] за [' + order_info.money + ']',
+		on_click : function(sprout, stack){
+		    var order_card = new card({ name : 'porder_' + order_info.id}, null, stack);
+		    if(typeof order_card.old != 'undefined')
+			return;
+		    new text({ 
+				 height : 1,
+				 width : 1,
+				 text : 'откуда -' + order_info.from }, null, stack);
+		    new text({ 
+				 height : 1,
+				 width : 1,
+				 text : 'куда -' + order_info.to }, null, stack);
+		    new text({ 
+				 height : 1,
+				 width : 1,
+				 text : 'цена -' + order_info.money }, null, stack);
+		    new text({ 
+				 height : 1,
+				 width : 1,
+				 text : 'когда -' + order_info.when }, null, stack);
+		    new click( { 
+				   height : 1,
+				   width : 1,
+				   label : 'изменить',
+				   on_click : function(sprout, stack){
+				       order_card.destroy(stack);
+				       edit_order_card(stack, order_info, 'изменить', function(order){
+							   order_info = order;
+							   order_click.set_label('от [' + order_info.from + '] до [' + order_info.to + '] за [' + order_info.money + ']');
+							   porders.replace_order(order).run();
+						       });
+				   }
+			       }, null, stack ); 			     
+		}
+	    }, null, stack)
     }
 }
 
@@ -127,57 +158,70 @@ function passenger(sprout, stack){
     }
     
     stack.order_item = order_item;
-    orders.get_order_by_id('vah').sprout(
+    porders.get_order_by_id('vah').sprout(
 	dsa.seq.f(function(sprout, stack){
 		      stack.order_item(stack, stack.order);
 		  })
     ).run(stack);
+
+    porders.on_subscribe  = function(sprout, stack){
+    };
+
+    porders.subscribe('take').run(stack);
 }
 
-function taxi_order(stack, order_info){
-    with(ui.highlevel){	
-	new click({
-		      width : 2,
-		      height : 1,
-		      label : 'от [' + order_info.from + '] до [' + order_info.to + '] за [' + order_info.money + ']',
-		      on_click : function(sprout, stack){
-			  var order_card = new card({ name : 'torder_' + order_info.id}, null, stack);
-			  if(typeof order_card.old != 'undefined')
-			      return;
+/*
+ * taxi app
+ */
 
-			  new text({ 
-				       height : 1,
-				       width : 1,
-				       text : 'откуда -' + order_info.from }, null, stack);
-			  new text({ 
-				       height : 1,
-				       width : 1,
-				       text : 'куда -' + order_info.to }, null, stack);
-			  new text({ 
-				       height : 1,
-				       width : 1,
-				       text : 'цена -' + order_info.money }, null, stack);
-			  new text({ 
-				       height : 1,
-				       width : 1,
-				       text : 'когда -' + order_info.when }, null, stack);
-			  new click( { 
-					 height : 1,
-					 width : 1,
-					 label : 'согласиться',
-					 on_click : function(sprout, stack){
-					 }
-				     }, null, stack ); 			     
-			  new click( { 
-					 height : 1,
-					 width : 1,
-					 row : true,
-					 label : 'написать',
-					 on_click : function(sprout, stack){
-					 }
-				     }, null, stack ); 			     
-		      }
-		  }, null, stack)
+var torders = dsa.get('sphere/objects/taxi/orders'), //instance for using by taxi app
+ui_orders = [];
+function taxi_order(stack, order_info){
+    ui_orders[order_info.id] = {};
+    with(ui.highlevel){	
+	ui_orders[order_info.id].click = new click(
+	    {
+		width : 2,
+		height : 1,
+		label : 'от [' + order_info.from + '] до [' + order_info.to + '] за [' + order_info.money + ']',
+		on_click : function(sprout, stack){
+		    var order_card = new card({ name : 'torder_' + order_info.id}, null, stack);
+		    if(typeof order_card.old != 'undefined')
+			return;
+
+		    new text({ 
+				 height : 1,
+				 width : 1,
+				 text : 'откуда -' + order_info.from }, null, stack);
+		    new text({ 
+				 height : 1,
+				 width : 1,
+				 text : 'куда -' + order_info.to }, null, stack);
+		    new text({ 
+				 height : 1,
+				 width : 1,
+				 text : 'цена -' + order_info.money }, null, stack);
+		    new text({ 
+				 height : 1,
+				 width : 1,
+				 text : 'когда -' + order_info.when }, null, stack);
+		    new click( { 
+				   height : 1,
+				   width : 1,
+				   label : 'согласиться',
+				   on_click : function(sprout, stack){
+				   }
+			       }, null, stack ); 			     
+		    new click( { 
+				   height : 1,
+				   width : 1,
+				   row : true,
+				   label : 'написать',
+				   on_click : function(sprout, stack){
+				   }
+			       }, null, stack ); 			     
+		}
+	    }, null, stack)
     }    
 }
 
@@ -199,7 +243,7 @@ function taxi(sprout, stack){
     }
 
     stack.taxi_order = taxi_order;
-    orders.get_orders().sprout(
+    torders.get_orders().sprout(
 	dsa.seq.f(function(sprout, stack){
 		      for(item in stack.orders){
 			  stack.taxi_order(stack, stack.orders[item]);
@@ -207,13 +251,22 @@ function taxi(sprout, stack){
 		  })
     ).run(stack);
     
-    orders.on_subscribe = function(sprout, stack){
-	taxi_card.make_current(stack);
-	taxi_order(stack, stack.order);
+    torders.on_subscribe = function(sprout, stack){
+	switch(stack.event){
+	    case '_new' :
+	        taxi_card.make_current(stack);
+	        taxi_order(stack, stack.order);
+	    break;
+
+	    case 'replace' : 
+	        ui_orders[stack.order.id].click.set_label('от [' + stack.order.from + '] до [' + stack.order.to + '] за [' + stack.order.money + ']');
+	    break;
+	}
 //	stack.prev_card.make_current();
     };
 
-    orders.subscribe('_new').run(stack);    
+    torders.subscribe('_new').run(stack);
+    torders.subscribe('replace').run(stack);    
 }
 
 module.exports = function(dsa, stack){

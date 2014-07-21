@@ -32,6 +32,7 @@ function subscribers(event_names, dsa){
     this.emit = function(event_name, stack){
 	var _handlers = handlers[event_name];
 	for(key in _handlers){
+	    stack['event'] = event_name;
 	    dsa.sprout.run(_handlers[key], stack);
 	}
     };
