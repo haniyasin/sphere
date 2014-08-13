@@ -29,18 +29,20 @@ function subscribers(event_names, dsa){
 	handlers[event_names[key]] = [];
     }
 
-    this.emit = function(event_name, stack){
+    this.emit = function(event_name, id, stack){
 	var _handlers = handlers[event_name];
 	for(key in _handlers){
-	    stack['event'] = event_name;
-	    dsa.sprout.run(_handlers[key], stack);
+	    if(_handlers[key].id == id || typeof _handlers[key].id == 'undefined'){
+		stack['event'] = event_name;
+		dsa.sprout.run(_handlers[key].sprout, stack);		
+	    }
 	}
     };
 
-    this.subscribe = function(event_name, sprout){
+    this.subscribe = function(event_name, id, sprout){
 	if(!handlers.hasOwnProperty(event_name))
 	    console.log(new error('event is not exist', event_name));
-	handlers[event_name].push(sprout);
+	handlers[event_name].push( { id : id, sprout : sprout });
     };
 }
 
@@ -54,7 +56,7 @@ exports.init = function(dsa){
     dsa.on('push_order', function(sprout, stack, order){
 	       orders[order.id] = order;
 	       stack.order = order;
-	       events.emit('_new', stack);
+	       events.emit('_new', null, stack);
 	       
 	       //	       var update_obj = {
 	       //	       };
@@ -65,14 +67,12 @@ exports.init = function(dsa){
     dsa.on('replace_order', function(sprout, stack, order){
 	       orders[order.id] = order;
 	       stack.order = order;
-	       events.emit('replace', stack);
+	       events.emit('replace', order.id, stack);
 	   });
 
     dsa.on('remove_order', function(sprout, stack, id){
 	       delete orders[id];
-
-	       stack.order = order;
-	       events.emit('remove', stack);
+	       events.emit('remove', id, stack);
 	   });
 
     dsa.on('take_order', function(sprout, stack, id){
@@ -83,11 +83,13 @@ exports.init = function(dsa){
 	       msg(storage, 'update', geo, update_obj);
 */
 	       stack.order = order;
-	       events.emit('take', stack);
+	       events.emit('take', id, stack);
 	   });
 
     dsa.on('get_orders', function(sprout, stack){
 	       stack.orders = orders;
+	       dsa.sprout.run(sprout, stack);
+	       return true;
 //	       msg(storage, 'extract', geo, { actived : true });
 	   });
     dsa.on('get_order_by_id', function(sprout, stack, id){
@@ -113,7 +115,7 @@ exports.init = function(dsa){
      * + order is removed(by passenger) 
      */
     dsa.on('subscribe', function(sprout, stack, event, id){
-	       events.subscribe(event, sprout);
+	       events.subscribe(event, id, sprout);
 	       return true;
 	   });
 };

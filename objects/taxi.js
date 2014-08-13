@@ -99,7 +99,10 @@ function order_item(stack, order_info){
 		height : 1,
 		label : 'от [' + order_info.from + '] до [' + order_info.to + '] за [' + order_info.money + ']',
 		on_click : function(sprout, stack){
-		    var order_card = new card({ name : 'porder_' + order_info.id}, null, stack);
+		    var order_card = new card({ 
+						  name : 'porder_' + order_info.id,
+						  width : 3
+					      }, null, stack);
 		    if(typeof order_card.old != 'undefined')
 			return;
 		    new text({ 
@@ -130,7 +133,18 @@ function order_item(stack, order_info){
 							   porders.replace_order(order).run();
 						       });
 				   }
-			       }, null, stack ); 			     
+			       }, null, stack);
+ 		    new click( {
+				   height : 1,
+				   width : 1,
+				   row : true,
+				   label : 'удалить',
+				   on_click : function(sprout, stack){
+				       order_click.destroy();
+				       order_card.destroy();
+				       porders.remove_order(order_info.id).run(stack);
+				   }
+			       }, null ,stack);
 		}
 	    }, null, stack)
     }
@@ -167,7 +181,7 @@ function passenger(sprout, stack){
     porders.on_subscribe  = function(sprout, stack){
     };
 
-    porders.subscribe('take').run(stack);
+//    porders.subscribe('take',).run(stack);
 }
 
 /*
@@ -242,15 +256,6 @@ function taxi(sprout, stack){
 		  },null, stack);	
     }
 
-    stack.taxi_order = taxi_order;
-    torders.get_orders().sprout(
-	dsa.seq.f(function(sprout, stack){
-		      for(item in stack.orders){
-			  stack.taxi_order(stack, stack.orders[item]);
-		      }
-		  })
-    ).run(stack);
-    
     torders.on_subscribe = function(sprout, stack){
 	switch(stack.event){
 	    case '_new' :
@@ -261,12 +266,25 @@ function taxi(sprout, stack){
 	    case 'replace' : 
 	        ui_orders[stack.order.id].click.set_label('от [' + stack.order.from + '] до [' + stack.order.to + '] за [' + stack.order.money + ']');
 	    break;
+
+	    case  'remove' :
+	        ui_orders[stack.order.id].click.destroy();
+	    break;
 	}
 //	stack.prev_card.make_current();
     };
 
     torders.subscribe('_new').run(stack);
-    torders.subscribe('replace').run(stack);    
+
+    torders.on_get_orders = function(sprout, stack){
+	for(item in stack.orders){
+	    taxi_order(stack, stack.orders[item]);
+	    torders.subscribe('replace', stack.orders[item].id).run(stack);
+  	    torders.subscribe('remove', stack.orders[item].id).run(stack);
+	}	
+    };
+
+    torders.get_orders().run(stack);    
 }
 
 module.exports = function(dsa, stack){
