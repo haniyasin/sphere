@@ -87,20 +87,25 @@ function create_order(sprout, stack){
 		      });
 }
 
+var orders = [];
+
 function order_item(stack, order_info){
     with(ui.highlevel){	
-	var order_click = new click(
+	var order = orders[order_info.id] = {};
+	order.click = new click(
 	    {
 		width : 2,
 		height : 1,
 		label : 'от [' + order_info.from + '] до [' + order_info.to + '] за [' + order_info.money + ']',
 		on_click : function(sprout, stack){
-		    var order_card = new card({ 
-						  name : 'porder_' + order_info.id,
-						  width : 3
-					      }, null, stack);
-		    if(typeof order_card.old != 'undefined')
+		    order.card = new card({ 
+					      name : 'porder_' + order_info.id,
+					      width : 3
+					  }, null, stack);
+
+		    if(typeof order.card.old != 'undefined')
 			return;
+
 		    new text({ 
 				 height : 1,
 				 width : 1,
@@ -122,11 +127,11 @@ function order_item(stack, order_info){
 				   width : 1,
 				   label : 'изменить',
 				   on_click : function(sprout, stack){
-				       order_card.destroy(stack);
-				       edit_order_card(stack, order_info, 'изменить', function(order){
-							   order_info = order;
-							   order_click.set_label('от [' + order_info.from + '] до [' + order_info.to + '] за [' + order_info.money + ']');
-							   porders.replace_order(order).run();
+				       order.card.destroy(stack);
+				       edit_order_card(stack, order_info, 'изменить', function(_order){
+							   order_info = _order;
+							   order.click.set_label('от [' + order_info.from + '] до [' + order_info.to + '] за [' + order_info.money + ']');
+							   porders.replace_order(_order).run();
 						       });
 				   }
 			       }, null, stack);
@@ -136,8 +141,8 @@ function order_item(stack, order_info){
 				   row : true,
 				   label : 'удалить',
 				   on_click : function(sprout, stack){
-				       order_click.destroy();
-				       order_card.destroy();
+				       order.click.destroy();
+				       order.card.destroy();
 				       porders.remove_order(order_info.id).run(stack);
 				   }
 			       }, null ,stack);
@@ -147,39 +152,66 @@ function order_item(stack, order_info){
 }
 
 exports.init = function(_dsa){
+    var display_stack;
     _dsa.on('display', function(sprout, stack){
-	       with(ui.highlevel){
-		   stack.passenger = new card({
-						  name : 'passenger'
-					      }, null, stack);
-		   if(typeof stack.passenger.old != 'undefined')
-		       return;
-
-		   new text({
-				height : 1,
-				width : 2,
-				text : 'мои заказы'
-			    }, null ,stack),
-		   new click({
+		display_stack = stack;
+		with(ui.highlevel){
+		    stack.passenger = new card({
+						   name : 'passenger'
+					       }, null, stack);
+		    if(typeof stack.passenger.old != 'undefined')
+			return;
+		    
+		    new text({
 				 height : 1,
 				 width : 2,
-				 label : 'создать новый',
-				 on_click : create_order 
-			     }, null, stack);	
-	       }
-	       
-	       stack.order_item = order_item;
-	       porders.get_order_by_id('vah').sprout(
-		   dsa.seq.f(function(sprout, stack){
-				 stack.order_item(stack, stack.order);
-			     })
-	       ).run(stack);
-
-	       porders.on_subscribe  = function(sprout, stack){
-	       };
-
-	       //    porders.subscribe('take',).run(stack);
-	   });
-    _dsa.on('msg', function(sprout, stack){
+				 text : 'мои заказы'
+			     }, null ,stack),
+		    new click({
+				  height : 1,
+				  width : 2,
+				  label : 'создать новый',
+				  on_click : create_order 
+			      }, null, stack);	
+		}
+		
+		stack.order_item = order_item;
+		porders.get_order_by_id('vah').sprout(
+		    dsa.seq.f(function(sprout, stack){
+				  stack.order_item(stack, stack.order);
+			      })
+		).run(stack);
+		
+		porders.on_subscribe  = function(sprout, stack){
+		};
+		
+		//    porders.subscribe('take',).run(stack);
+	    });
+    
+    _dsa.on('msg', function(sprout, stack, id, text){
+		orders[id].click.set_label(text);
+		with(ui.highlevel){
+		    new card({ name : 'msg' + id}, null, display_stack);
+		    new text({
+				 height : 1,
+				 with : 3,
+				 text : 'lalala'
+			     }, null, display_stack);
+		    var answer = new entry({
+					       height : 2,
+					       width : 3,
+					       advertisement : 'введите ответ'
+					   }, null, display_stack);
+		    new click({
+				  height : 1,
+				  width : 1,
+				  label : 'ответить',
+				  on_click : function(sprout, stack){
+				      var taxi = dsa.get('sphere/objects/taxi/taxi');
+				      taxi.msg(id, answer.get_value()).run(stack);
+				  }
+			      }, null, display_stack);
+		}
+		//установить каллбэк для отображения сообщения
 	   });
 };
