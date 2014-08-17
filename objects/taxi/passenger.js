@@ -188,14 +188,14 @@ exports.init = function(_dsa){
 		//    porders.subscribe('take',).run(stack);
 	    });
     
-    _dsa.on('msg', function(sprout, stack, id, text){
-		orders[id].click.set_label(text);
+    _dsa.on('msg', function(sprout, stack, id, _text){
+		orders[id].click.set_label(_text);
 		with(ui.highlevel){
 		    new card({ name : 'msg' + id}, null, display_stack);
 		    new text({
 				 height : 1,
-				 with : 3,
-				 text : 'lalala'
+				 width : 1,
+				 text : _text
 			     }, null, display_stack);
 		    var answer = new entry({
 					       height : 2,
