@@ -12,16 +12,43 @@ var calc = {
 
     calculate : function(){
 	for(key in this.rooms){
-	    alert(this.rooms[key].floor.width * this.rooms[key].floor.length * 300);
+	    //alert(this.rooms[key].floor.width * this.rooms[key].floor.length * 300);
 	}
     }
 };
 
-function chooser(info, lala, stack){
-    info.on_click = function(sprout, stack){
-	
-    };
-    new ui.highlevel.click(info, null, stack);
+function chooser(info, fields, lala, stack){
+    var chooser_click;
+    with(ui.highlevel){
+	info.on_click = function(sprout, stack){
+	    var chooser_card = new card({ name : 'выбирете один или несколько пунктов'}, null ,stack);
+	    var choosed_fields = {};
+	    for(key in fields){
+		(function(key){
+		     new click({
+				   width : 2,
+				   height : 1,
+				   label : fields[key][0],
+				   on_click : function(sprout, stack){
+				       choosed_fields[key] = true;
+				   }
+			       }, null, stack);		     
+		 })(key);
+	    }
+
+	    new click({
+			  width : 1,
+			  height : 1,
+			  label : 'закончить',
+			  on_click : function(sprout, stack){
+			      chooser_card.destroy();
+			      info.on_choose(choosed_fields);
+			  }
+		      }, null, stack);
+	    
+	};
+	chooser_click = new ui.highlevel.click(info, null, stack);	
+    }
 }
 
 var floor_condition = {
@@ -39,13 +66,26 @@ floor_to_do = {
     pvh : ['уложить линолиум', true]
 };
 
+function chooser_fields_to_string(choosed_fields, fields_list){
+    var string = '';
+    for(key in choosed_fields){
+	string += fields_list[key][0] + '=да;'; 
+    }
+
+    return string;
+}
+
 function add_room_floor(sprout, stack){
+    var prev_card = stack.card;
     with(ui.highlevel){
 	var floor_card = new card({
 				      name : 'добавляем пол'
 				  }, null, stack);    
 	if(typeof floor_card.old != 'undefined')
 	    return;
+
+	var floor = {
+	};
 
 	new entry({
 		      width : 1,
@@ -60,18 +100,35 @@ function add_room_floor(sprout, stack){
 	new chooser({
 			width : 2,
 			height : 1,
-			label : 'нынешнее состояние'	    
-		    }, null, stack);
+			label : 'нынешнее состояние',
+			on_choose : function(fields){
+			    floor.condition = fields;
+			}
+		    }, floor_condition, null, stack);
 	new chooser({
 			width : 2,
 			height : 1,
-			label : 'что нужно сделать'
-		    }, null, stack);	
+			label : 'что нужно сделать',
+			on_choose : function(fields){
+			    floor.to_do = fields;
+			}
+		    }, floor_to_do, null, stack);	
 	new click({
 		      width : 1,
 		      height : 1,
 		      label : 'закончить',
 		      on_click : function(sprout, stack){
+			  stack.card = prev_card;
+			  new text({
+				       width : 3,
+				       height : 1,
+				       text : chooser_fields_to_string(floor.condition, floor_condition) 
+				   }, null, stack);
+			  new text({
+				       width : 3,
+				       height : 1,
+				       text : chooser_fields_to_string(floor.to_do, floor_to_do)
+				   }, null, stack);
 			  calc.rooms.push({
 					      floor : {
 						  width : 5,
