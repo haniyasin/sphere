@@ -17,6 +17,15 @@ var calc = {
     }
 };
 
+function chooser_fields_to_string(choosed_fields, fields_list){
+    var string = '';
+    for(key in choosed_fields){
+	string += fields_list[key][0] + '=да;'; 
+    }
+
+    return string;
+}
+
 function chooser(info, fields, lala, stack){
     var chooser_click;
     with(ui.highlevel){
@@ -42,6 +51,7 @@ function chooser(info, fields, lala, stack){
 			  label : 'закончить',
 			  on_click : function(sprout, stack){
 			      chooser_card.destroy();
+			      chooser_click.set_label(chooser_fields_to_string(choosed_fields, fields));
 			      info.on_choose(choosed_fields);
 			  }
 		      }, null, stack);
@@ -51,29 +61,80 @@ function chooser(info, fields, lala, stack){
     }
 }
 
-var floor_condition = {
-    bad : ['плохое', true],
-    medium : ['среднее', false],
-    good : ['хороше', false],
-    concrete : ['бетонный пол', true],
-    wood : ['доска, фанера или паркет по лаге', false]    
-},
-floor_to_do = {
-//    wood : ['фанера по лаге', false],
-//    concrete : ['растворная стяжка', false],
-//    lightconcrete : ['лёгкое выравнивание самовыравнивающимся раствором', false],
-    laminate : ['уложить ламинат', false],
-    pvh : ['уложить линолиум', true]
-};
-
-function chooser_fields_to_string(choosed_fields, fields_list){
-    var string = '';
-    for(key in choosed_fields){
-	string += fields_list[key][0] + '=да;'; 
+function form(desc, parent, stack){
+    with(ui.highlevel){	
+	for(key in desc){
+	    if(typeof desc[key] == 'string' && key == 'type'){
+		switch(desc[key]){
+		case 'form' :
+		    if(!desc.hasOwnProperty('label'))
+		       return 'label is not found';
+		    desc.width = 2;
+		    desc.height = 1;
+		    desc.on_click = function(sprout, stack){
+			//FIXME uuid generate instead form string
+			var form_card = new card({name : 'form'}, null, stack);
+			if(typeof form_card.old != 'undefined')
+			    return;
+			desc.collection = {};
+			form(desc.items, desc.collection, stack);
+		    };
+		    new click(desc, null ,stack);
+		    break;
+		case 'chooser':		    
+		    break;
+		case 'entry' :
+		    new entry(desc, null, stack);
+		    break;
+		}    	    
+	    } else
+		if(typeof desc[key] == 'object' && key != 'items')
+		    form(desc[key], {}, stack);
+	}
     }
-
-    return string;
 }
+
+var floor_desc = {
+    type : 'form',
+    label : 'добавить пол',
+    
+    items : {
+	width : {
+	    type : 'entry',
+	    advertisement : 'ширина в метрах',
+	    width : 2,
+	    height : 1
+	},
+	length : {
+	    type : 'entry',
+	    advertisement : 'длина в метрах',
+	    width : 2,
+	    height : 1
+	},
+	condition : {
+	    type : 'chooser',
+	    label : 'текущее состояние',
+	    values : {
+		bad : ['плохое', true],
+		medium : ['среднее', false],
+		good : ['хороше', false],
+		concrete : ['бетонный пол', true],
+		wood : ['доска, фанера или паркет по лаге', false]    	    		
+	    }
+	},
+	to_do : {
+	    type : 'chooser',
+	    label : 'что сделать',
+	    values : {
+		//    wood : ['фанера по лаге', false],
+		//    concrete : ['растворная стяжка', false],
+		//    lightconcrete : ['лёгкое выравнивание самовыравнивающимся раствором', false],
+		laminate : ['уложить ламинат', false],
+		pvh : ['уложить линолиум', true]		
+	    }
+	}	
+    }	    
+};
 
 function add_room_floor(sprout, stack){
     var prev_card = stack.card;
@@ -87,54 +148,20 @@ function add_room_floor(sprout, stack){
 	var floor = {
 	};
 
-	new entry({
-		      width : 1,
-		      height : 1,
-		      advertisement : 'ширина в метрах'
-		  }, null, stack);    
-	new entry({
-		      width : 1,
-		      height : 1,
-		      advertisement : 'длина в метрах'
-		  }, null, stack);
-	new chooser({
-			width : 2,
-			height : 1,
-			label : 'нынешнее состояние',
-			on_choose : function(fields){
-			    floor.condition = fields;
-			}
-		    }, floor_condition, null, stack);
-	new chooser({
-			width : 2,
-			height : 1,
-			label : 'что нужно сделать',
-			on_choose : function(fields){
-			    floor.to_do = fields;
-			}
-		    }, floor_to_do, null, stack);	
+	floor.to_do = new chooser({
+				      width : 2,
+				      height : 1,
+				      label : 'что нужно сделать'
+				  }, floor_to_do, null, stack);	
 	new click({
 		      width : 1,
 		      height : 1,
 		      label : 'закончить',
 		      on_click : function(sprout, stack){
 			  stack.card = prev_card;
-			  new text({
-				       width : 3,
-				       height : 1,
-				       text : chooser_fields_to_string(floor.condition, floor_condition) 
-				   }, null, stack);
-			  new text({
-				       width : 3,
-				       height : 1,
-				       text : chooser_fields_to_string(floor.to_do, floor_to_do)
-				   }, null, stack);
-			  calc.rooms.push({
-					      floor : {
-						  width : 5,
-						  length : 5
-					      }
-					  });
+			  for(key in floor){
+			      floor[key] = floor[key].get_value();
+			  }
 			  calc.calculate();
 		      }
 		  }, null, stack);
@@ -156,17 +183,13 @@ function add_room(sprout, stack){
 				 }, null, stack);
 	if(typeof room_card.old != 'undefined')
 	    return;
+	var room = {};
 	new entry({
 		      height : 1,
 		      width : 2,
 		      advertisement : 'название комнаты'
 		  }, null, stack);
-	new click({
-		      height : 1,
-		      width : 1,
-		      label : 'добавить пол',
-		      on_click : add_room_floor
-		   }, null, stack);
+	new form(floor_desc, room, stack);
   	new click({
 		      height : 1,
 		      width : 1,
