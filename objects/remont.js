@@ -3,6 +3,7 @@
  */
 
 var ui = require('../../dsa/objects/ui.js');
+var uuid = require('../../modules/uuid.js');
 
 var calc = {
     type : 'flat',
@@ -26,7 +27,7 @@ function chooser_fields_to_string(choosed_fields, fields_list){
     return string;
 }
 
-function chooser(info, fields, lala, stack){
+function chooser(info, fields, stack){
     var chooser_click;
     with(ui.highlevel){
 	info.on_click = function(sprout, stack){
@@ -72,19 +73,40 @@ function form(desc, parent, stack){
 		    desc.width = 2;
 		    desc.height = 1;
 		    desc.on_click = function(sprout, stack){
-			//FIXME uuid generate instead form string
-			var form_card = new card({name : 'form'}, null, stack);
-			if(typeof form_card.old != 'undefined')
-			    return;
+			var form_card = new card({name : uuid.generate_str()}, null, stack);
 			desc.collection = {};
 			form(desc.items, desc.collection, stack);
+
+			new click({
+				      width : 1,
+				      height : 1,
+				      label : 'закончить',
+				      on_click : function(sprout, stack){
+					  //			  stack.card = prev_card;
+					  //			  calc.calculate();
+					  for(key in desc.items){
+					      alert(desc.items[key].get_value());
+					  }
+
+					  form_card.destroy();
+				      }
+				  }, null, stack);			
 		    };
 		    new click(desc, null ,stack);
 		    break;
-		case 'chooser':		    
+
+		case 'chooser':
+		    desc.on_choose = function(fields){
+			desc.get_value = function(){
+			    return fields;
+			};	
+		    };
+		    desc.element = new chooser(desc, desc.values, stack);		    
 		    break;
+
 		case 'entry' :
-		    new entry(desc, null, stack);
+		    desc.element = new entry(desc, null, stack);
+		    desc.get_value = desc.element.get_value;	
 		    break;
 		}    	    
 	    } else
@@ -113,11 +135,13 @@ var floor_desc = {
 	},
 	condition : {
 	    type : 'chooser',
-	    label : 'текущее состояние',
+	    label : 'как сейчас',
+	    width : 2,
+	    height : 1,
 	    values : {
-		bad : ['плохое', true],
-		medium : ['среднее', false],
-		good : ['хороше', false],
+		bad : ['кривой, вода в угол утекает', true],
+		medium : ['терпимо, но вода в угол', false],
+		good : ['относительно ровный', false],
 		concrete : ['бетонный пол', true],
 		wood : ['доска, фанера или паркет по лаге', false]    	    		
 	    }
@@ -125,6 +149,8 @@ var floor_desc = {
 	to_do : {
 	    type : 'chooser',
 	    label : 'что сделать',
+	    width : 2,
+	    height : 1,
 	    values : {
 		//    wood : ['фанера по лаге', false],
 		//    concrete : ['растворная стяжка', false],
@@ -136,35 +162,90 @@ var floor_desc = {
     }	    
 };
 
-function add_room_floor(sprout, stack){
-    var prev_card = stack.card;
-    with(ui.highlevel){
-	var floor_card = new card({
-				      name : 'добавляем пол'
-				  }, null, stack);    
-	if(typeof floor_card.old != 'undefined')
-	    return;
+var ceiling_desc = {
+    type : "form",
+    label : "добавить потолок",
+    
+    items : {
+	width : {
+	    type : 'entry',
+	    advertisement : 'ширина в метрах',
+	    width : 2,
+	    height : 1
+	},
+	length : {
+	    type : 'entry',
+	    advertisement : 'длина в метрах',
+	    width : 2,
+	    height : 1
+	},
+	condition : {
+	    type : 'chooser',
+	    label : 'как сейчас',
+	    width : 2,
+	    height : 1,
+	    values : {
+		bad : ['кривой, с перепадами', true],
+		medium : ['корявый', false],
+		good : ['неплохой', false],
+		concrete : ['бетон, монолит', true],
+		plate : ['плита', false]    	    		
+	    }
+	},
+	to_do : {
+	    type : 'chooser',
+	    label : 'что сделать',
+	    width : 2,
+	    height : 1,
+	    values : {
+		vinil : ['натяжной потолок', false],
+		paint : ['выровнять и покрасить', true],
+		gips_paint : ['гипсокартон и покрасить', false]		
+	    }
+	}	
+    }
+};
 
-	var floor = {
-	};
-
-	floor.to_do = new chooser({
-				      width : 2,
-				      height : 1,
-				      label : 'что нужно сделать'
-				  }, floor_to_do, null, stack);	
-	new click({
-		      width : 1,
-		      height : 1,
-		      label : 'закончить',
-		      on_click : function(sprout, stack){
-			  stack.card = prev_card;
-			  for(key in floor){
-			      floor[key] = floor[key].get_value();
-			  }
-			  calc.calculate();
-		      }
-		  }, null, stack);
+var wall_desc = {
+    type : "form",
+    label : "добавить стену",
+    
+    items : {
+	length : {
+	    type : 'entry',
+	    advertisement : 'длина в метрах',
+	    width : 2,
+	    height : 1
+	},
+	height : {
+	    type : 'entry',
+	    advertisement : 'высота в метрах',
+	    width : 2,
+	    height : 1
+	},
+	condition : {
+	    type : 'chooser',
+	    label : 'как сейчас',
+	    width : 2,
+	    height : 1,
+	    values : {
+		bad : ['кривизна, выбоины, шишки', true],
+		medium : ['выбоины и шишки', false],
+		good : ['небольшие неровности', false],
+		concrete : ['бетон или панель', true],
+		brick : ['кирпич', false]
+	    }
+	},
+	to_do : {
+	    type : 'chooser',
+	    label : 'что сделать',
+	    width : 2,
+	    height : 1,
+	    values : {
+		wallpaper : ['обои наклеить', false],
+		paint : ['покрасить', true]		
+	    }
+	}	
     }
 }
 
@@ -190,18 +271,8 @@ function add_room(sprout, stack){
 		      advertisement : 'название комнаты'
 		  }, null, stack);
 	new form(floor_desc, room, stack);
-  	new click({
-		      height : 1,
-		      width : 1,
-		      label : 'добавить потолок',
-		      on_click : add_room_ceiling
-		   }, null, stack);
-	new click({
-		      height : 1,
-		      width : 1,
-		      label : 'добавить стену',
-		      on_click : add_room_wall
-		   }, null, stack);
+  	new form(ceiling_desc, room ,stack);
+	new form(wall_desc, room, stack);
       }    
 }
 
@@ -237,7 +308,7 @@ function flat(sprout, stack){
 		      label : 'добавить комнату',
 		      on_click : add_room 
 		  }, null, stack);	
-	new click({
+/*	new click({
 		      height : 1,
 		      width : 2,
 		      label : 'добавить санузел',
@@ -248,7 +319,7 @@ function flat(sprout, stack){
 		      width : 2,
 		      label : 'добавить кухню',
 		      on_click : add_kitchen 
-		  }, null, stack);	
+		  }, null, stack);	*/
     }
     
 //    stack.order_item = order_item;
