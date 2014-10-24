@@ -62,7 +62,7 @@ function chooser(info, fields, stack){
     }
 }
 
-function form(desc, parent, stack){
+function form(desc, parent, callbacks, stack){
     with(ui.highlevel){	
 	for(key in desc){
 	    if(typeof desc[key] == 'string' && key == 'type'){
@@ -75,7 +75,7 @@ function form(desc, parent, stack){
 		    desc.on_click = function(sprout, stack){
 			var form_card = new card({name : uuid.generate_str()}, null, stack);
 			desc.collection = {};
-			form(desc.items, desc.collection, stack);
+			form(desc.items, desc.collection, undefined, stack);
 
 			new click({
 				      width : 1,
@@ -111,151 +111,181 @@ function form(desc, parent, stack){
 		}    	    
 	    } else
 		if(typeof desc[key] == 'object' && key != 'items')
-		    form(desc[key], {}, stack);
+		    form(desc[key], {}, undefined, stack);
 	}
     }
 }
 
-var floor_desc = {
-    type : 'form',
-    label : 'добавить пол',
+var flat_desc = {
+    type : 'container',
+    label : 'квартиры',
     
-    items : {
-	width : {
-	    type : 'entry',
-	    advertisement : 'ширина в метрах',
-	    width : 2,
-	    height : 1
-	},
-	length : {
-	    type : 'entry',
-	    advertisement : 'длина в метрах',
-	    width : 2,
-	    height : 1
-	},
-	condition : {
-	    type : 'chooser',
-	    label : 'как сейчас',
-	    width : 2,
-	    height : 1,
-	    values : {
-		bad : ['кривой, вода в угол утекает', true],
-		medium : ['терпимо, но вода в угол', false],
-		good : ['относительно ровный', false],
-		concrete : ['бетонный пол', true],
-		wood : ['доска, фанера или паркет по лаге', false]    	    		
-	    }
-	},
-	to_do : {
-	    type : 'chooser',
-	    label : 'что сделать',
-	    width : 2,
-	    height : 1,
-	    values : {
-		//    wood : ['фанера по лаге', false],
-		//    concrete : ['растворная стяжка', false],
-		//    lightconcrete : ['лёгкое выравнивание самовыравнивающимся раствором', false],
-		laminate : ['уложить ламинат', false],
-		pvh : ['уложить линолиум', true]		
-	    }
-	}	
-    }	    
-};
+    form : {
+	label : 'добавить квартиру',
 
-var ceiling_desc = {
-    type : "form",
-    label : "добавить потолок",
-    
-    items : {
-	width : {
-	    type : 'entry',
-	    advertisement : 'ширина в метрах',
-	    width : 2,
-	    height : 1
-	},
-	length : {
-	    type : 'entry',
-	    advertisement : 'длина в метрах',
-	    width : 2,
-	    height : 1
-	},
-	condition : {
-	    type : 'chooser',
-	    label : 'как сейчас',
-	    width : 2,
-	    height : 1,
-	    values : {
-		bad : ['кривой, с перепадами', true],
-		medium : ['корявый', false],
-		good : ['неплохой', false],
-		concrete : ['бетон, монолит', true],
-		plate : ['плита', false]    	    		
+	items : {
+	    rooms : {
+		type : 'container',
+		label : 'комнаты',
+		
+		form : {
+		    label : 'добавить комнату',
+		    items : {
+			name : {
+			    type : 'entry',
+			    advertisement : 'название комнаты',
+			    width : 2,
+			    height : 1
+			},
+			floors : {
+			    type : 'container',
+			    label : 'полы',
+
+			    form : {
+				label : 'добавить пол',
+				
+				items : {
+				    width : {
+					type : 'entry',
+					advertisement : 'ширина в метрах',
+					width : 2,
+					height : 1
+				    },
+				    length : {
+					type : 'entry',
+					advertisement : 'длина в метрах',
+					width : 2,
+					height : 1
+				    },
+				    condition : {
+					type : 'chooser',
+					label : 'как сейчас',
+					width : 2,
+					height : 1,
+					values : {
+					    bad : ['кривой, вода в угол утекает', true],
+					    medium : ['терпимо, но вода в угол', false],
+					    good : ['относительно ровный', false],
+					    concrete : ['бетонный пол', true],
+					    wood : ['доска, фанера или паркет по лаге', false]    	    		
+					}
+				    },
+				    to_do : {
+					type : 'chooser',
+					label : 'что сделать',
+					width : 2,
+					height : 1,
+					values : {
+					    //    wood : ['фанера по лаге', false],
+					    //    concrete : ['растворная стяжка', false],
+					    //    lightconcrete : ['лёгкое выравнивание самовыравнивающимся раствором', false],
+					    laminate : ['уложить ламинат', false],
+					    pvh : ['уложить линолиум', true]		
+					}
+				    }	
+				}	    
+			    }
+			},
+			ceilings : {
+			    type : 'container',
+			    label : 'потолки',
+			    
+			    form : {
+				label : "добавить потолок",
+				
+				items : {
+				    width : {
+					type : 'entry',
+					advertisement : 'ширина в метрах',
+					width : 2,
+					height : 1
+				    },
+				    length : {
+					type : 'entry',
+					advertisement : 'длина в метрах',
+					width : 2,
+					height : 1
+				    },
+				    condition : {
+					type : 'chooser',
+					label : 'как сейчас',
+					width : 2,
+					height : 1,
+					values : {
+					    bad : ['кривой, с перепадами', true],
+					    medium : ['корявый', false],
+					    good : ['неплохой', false],
+					    concrete : ['бетон, монолит', true],
+					    plate : ['плита', false]    	    		
+					}
+				    },
+				    to_do : {
+					type : 'chooser',
+					label : 'что сделать',
+					width : 2,
+					height : 1,
+					values : {
+					    vinil : ['натяжной потолок', false],
+					    paint : ['выровнять и покрасить', true],
+					    gips_paint : ['гипсокартон и покрасить', false]		
+					}
+				    }	
+				}
+			    }
+			},
+			walls : {
+			    type : 'container',
+			    label : 'стены',
+
+			    form : {
+				label : "добавить стену",
+				
+				items : {
+				    length : {
+					type : 'entry',
+					advertisement : 'длина в метрах',
+					width : 2,
+					height : 1
+				    },
+				    height : {
+					type : 'entry',
+					advertisement : 'высота в метрах',
+					width : 2,
+					height : 1
+				    },
+				    condition : {
+					type : 'chooser',
+					label : 'как сейчас',
+					width : 2,
+					height : 1,
+					values : {
+					    bad : ['кривизна, выбоины, шишки', true],
+					    medium : ['выбоины и шишки', false],
+					    good : ['небольшие неровности', false],
+					    concrete : ['бетон или панель', true],
+					    brick : ['кирпич', false]
+					}
+				    },
+				    to_do : {
+					type : 'chooser',
+					label : 'что сделать',
+					width : 2,
+					height : 1,
+					values : {
+					    wallpaper : ['обои наклеить', false],
+					    paint : ['покрасить', true]		
+					}
+				    }	
+				}
+			    }
+			}
+
+		    }
+		}
 	    }
-	},
-	to_do : {
-	    type : 'chooser',
-	    label : 'что сделать',
-	    width : 2,
-	    height : 1,
-	    values : {
-		vinil : ['натяжной потолок', false],
-		paint : ['выровнять и покрасить', true],
-		gips_paint : ['гипсокартон и покрасить', false]		
-	    }
-	}	
+	}
     }
 };
-
-var wall_desc = {
-    type : "form",
-    label : "добавить стену",
-    
-    items : {
-	length : {
-	    type : 'entry',
-	    advertisement : 'длина в метрах',
-	    width : 2,
-	    height : 1
-	},
-	height : {
-	    type : 'entry',
-	    advertisement : 'высота в метрах',
-	    width : 2,
-	    height : 1
-	},
-	condition : {
-	    type : 'chooser',
-	    label : 'как сейчас',
-	    width : 2,
-	    height : 1,
-	    values : {
-		bad : ['кривизна, выбоины, шишки', true],
-		medium : ['выбоины и шишки', false],
-		good : ['небольшие неровности', false],
-		concrete : ['бетон или панель', true],
-		brick : ['кирпич', false]
-	    }
-	},
-	to_do : {
-	    type : 'chooser',
-	    label : 'что сделать',
-	    width : 2,
-	    height : 1,
-	    values : {
-		wallpaper : ['обои наклеить', false],
-		paint : ['покрасить', true]		
-	    }
-	}	
-    }
-}
-
-function add_room_ceiling(sprout, stack){
-    
-}
-
-function add_room_wall(sprout, stack){
-    
-}
 
 function add_room(sprout, stack){
     with(ui.highlevel){
@@ -270,18 +300,16 @@ function add_room(sprout, stack){
 		      width : 2,
 		      advertisement : 'название комнаты'
 		  }, null, stack);
-	new form(floor_desc, room, stack);
+	new form(floor_desc, room, { on_finish : function(form){
+					 if(!self.hasOwnProperty('floors'))
+					     self.floors = {};
+					 self.floors[form.id] = form;
+					 new form(form, room, undefined, stack);
+				     } },
+		 stack);
   	new form(ceiling_desc, room ,stack);
 	new form(wall_desc, room, stack);
       }    
-}
-
-function add_bathroom(sprout, stack){
-    
-}
-
-function add_kitchen(sprout, stack){
-    
 }
 
 function flat(sprout, stack){
@@ -337,6 +365,8 @@ module.exports = function(dsa, stack){
 				    }, null, stack);
 	if(typeof remont_type.old != 'undefined')
 	    return;
+
+	new 
 
 	new click({
 		      height : 1,
